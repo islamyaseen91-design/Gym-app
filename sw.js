@@ -1,5 +1,5 @@
 // Offline cache: app shell is cache-first, fonts are cached as they load.
-const CACHE = "gym-log-v1";
+const CACHE = "gym-log-v2";
 const SHELL = ["./", "index.html", "manifest.json", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", e => {
