@@ -763,13 +763,17 @@ function whoopKey() {
 const whoopBase = () => (whoop().url || "").trim().replace(/\/+$/, "");
 async function syncWhoop(force) {
   const w = whoop();
-  if (!w.connected || !whoopBase()) return;
+  if ((!w.connected && !w.pending) || !whoopBase()) return;
   if (!force && w.fetched && Date.now() - w.fetched < 30 * 60000) return;
   try {
     const r = await fetch(`${whoopBase()}/recovery?key=${whoopKey()}`);
     const d = await r.json();
     w.fetched = Date.now();
-    if (d.connected === false) { w.connected = false; save(); toast("انقطع الربط مع WHOOP. اربطه من جديد من الإعدادات."); return refresh(); }
+    if (d.connected === false) {
+      if (w.pending) return; // still waiting for the user to finish the WHOOP consent
+      w.connected = false; save(); toast("انقطع الربط مع WHOOP. اربطه من جديد من الإعدادات."); return refresh();
+    }
+    if (d.connected && !w.connected) { w.connected = true; w.pending = false; toast("انربط WHOOP ✅"); }
     w.state = d.state || null;
     if (d.state === "SCORED" && d.date && dayKey(Date.parse(d.date)) === todayKey() && typeof d.score === "number") {
       (db.recovery ||= {})[todayKey()] = Math.round(d.score);
@@ -786,12 +790,12 @@ function whoopSettingsHTML() {
         <span class="chip ${w.connected ? "ready" : ""}">${w.connected ? "مربوط" : "مش مربوط"}</span></div>
       <small class="muted">${w.connected
         ? "نسبة التعافي بتنعبّى لحالها كل ما تفتح التطبيق، بعد ما WHOOP يحسبها الصبح."
-        : "اكتب رابط السيرفر تبعك على Cloudflare، واضغط «اربط». الشرح الكامل بملف whoop-worker/README.md."}</small>
+        : w.pending ? "إذا وافقت على صفحة WHOOP، اضغط «تحقق من الربط»." : "اكتب رابط السيرفر تبعك على Cloudflare، واضغط «اربط». الشرح الكامل بملف whoop-worker/README.md."}</small>
       <div class="field"><label class="eyebrow" for="whoop-url">رابط السيرفر (Cloudflare Worker)</label>
         <input class="input" id="whoop-url" dir="ltr" inputmode="url" placeholder="https://gym-whoop.xxxx.workers.dev" value="${esc(w.url || "")}"></div>
       <div class="row">${w.connected
         ? `<button class="btn" type="button" id="whoop-sync">حدّث الآن</button><button class="btn danger" type="button" id="whoop-off">افصل WHOOP</button>`
-        : `<button class="btn" type="button" id="whoop-connect" style="background:var(--accent);border-color:var(--accent);color:#fff">اربط WHOOP</button>`}</div>
+        : `<button class="btn" type="button" id="whoop-connect" style="background:var(--accent);border-color:var(--accent);color:#fff">اربط WHOOP</button>${w.pending ? `<button class="btn" type="button" id="whoop-sync">تحقق من الربط</button>` : ""}`}</div>
       <small class="muted">بدون ربط، بتقدر تكتب نسبة التعافي بإيدك من الصفحة الرئيسية. أحمر (أقل من 34%) بيوقّف اقتراح كسر الوزن، وأخضر (67% وفوق) بيشجعك تضغط.</small>
     </div>`;
 }
@@ -1422,7 +1426,7 @@ document.addEventListener("click", e => {
   if (t.id === "whoop-connect") {
     const u = document.getElementById("whoop-url").value.trim().replace(/\/+$/, "");
     if (!/^https:\/\/[^\s/]+$/.test(u)) return toast("اكتب رابط السيرفر كامل، بيبلّش بـ https://");
-    whoop().url = u; save();
+    whoop().url = u; whoop().pending = true; save();
     location.href = `${u}/login?key=${whoopKey()}&return=${encodeURIComponent(location.origin + location.pathname)}`;
     return;
   }
@@ -1504,10 +1508,10 @@ load();
 try { history.replaceState({ view: "home" }, ""); } catch (e) {}
 if (location.hash === "#whoop-ok" || location.hash === "#whoop-denied") {
   const ok = location.hash === "#whoop-ok";
-  if (ok) whoop().connected = true;
+  if (ok) { whoop().connected = true; whoop().pending = false; }
   save();
   try { history.replaceState({ view: "home" }, "", location.pathname); } catch (e) {}
-  setTimeout(() => toast(ok ? "انربط WHOOP ✅" : "ما تم الربط مع WHOOP"), 300);
+  if (!ok) setTimeout(() => toast("ما تم الربط مع WHOOP"), 300); else setTimeout(() => toast("انربط WHOOP ✅"), 300);
 }
 render();
 syncWhoop(true);
