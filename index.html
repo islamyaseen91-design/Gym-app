@@ -288,6 +288,35 @@ textarea.input { min-height: 110px; direction: ltr; font-family: ui-monospace, m
 .empty svg { width: 48px; height: 48px; color: var(--surface-3); }
 .empty b { color: var(--fg); font-family: var(--font-display); font-size: 1.05rem; }
 
+/* ---------- technique guide ---------- */
+.guide { padding: 0; overflow: hidden; }
+.guide summary { list-style: none; display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; }
+.guide summary::-webkit-details-marker { display: none; }
+.guide summary .ico { width: 40px; height: 40px; border-radius: 12px; background: var(--accent-soft); color: var(--accent-2); display: grid; place-items: center; flex: none; }
+.guide summary .ico svg { width: 22px; height: 22px; }
+.guide summary .grow { flex: 1; min-width: 0; }
+.guide summary b { display: block; font-family: var(--font-display); font-weight: 600; }
+.guide summary small { color: var(--muted); font-size: .78rem; }
+.guide summary .chev { transition: transform .2s; transform: rotate(-90deg); }
+.guide[open] summary .chev { transform: rotate(90deg); }
+.guide .body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 16px; border-top: 1px solid var(--line-soft); padding-top: 14px; }
+.guide h4 { margin: 0 0 8px; font-size: .75rem; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+.guide .musc { display: flex; flex-wrap: wrap; gap: 6px; }
+.guide ol { list-style: none; margin: 0; padding: 0; counter-reset: st; display: flex; flex-direction: column; gap: 10px; }
+.guide ol li { counter-increment: st; display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; font-size: .92rem; line-height: 1.65; }
+.guide ol li::before { content: counter(st); width: 26px; height: 26px; border-radius: 8px; background: var(--surface-3); color: var(--accent-2); display: grid; place-items: center; font-family: var(--font-num); font-weight: 700; font-size: .95rem; margin-top: 1px; }
+.guide ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.guide ul li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; font-size: .88rem; line-height: 1.6; color: var(--fg-2); }
+.guide ul.good li::before { content: "✓"; color: var(--ready); font-weight: 700; }
+.guide ul.bad li::before { content: "✕"; color: var(--fresh); font-weight: 700; }
+.guide .two { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.guide .safe { display: flex; gap: 10px; background: rgb(246 178 60 / .1); border: 1px solid rgb(246 178 60 / .25); color: var(--fg); border-radius: var(--r-sm); padding: 10px 12px; font-size: .86rem; line-height: 1.6; }
+.guide .safe::before { content: "⚠️"; }
+.guide .foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.guide .foot a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--fg); background: var(--surface-3); border: 1px solid var(--line); padding: 8px 14px; border-radius: var(--r-sm); font-weight: 600; font-size: .85rem; }
+.guide .foot a svg { width: 18px; height: 18px; color: var(--fresh); }
+.guide .note { font-size: .74rem; color: var(--muted); line-height: 1.6; }
+
 /* ---------- tab bar, timer, toast ---------- */
 .nav { position: fixed; inset-inline: 0; bottom: 0; z-index: 10; padding: 0 12px calc(10px + env(safe-area-inset-bottom, 0px)); pointer-events: none; }
 .nav .in { pointer-events: auto; max-width: 420px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); background: rgb(20 23 29 / .78); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); border: 1px solid rgb(255 255 255 / .07); border-radius: 22px; padding: 6px; box-shadow: 0 12px 32px rgb(0 0 0 / .45); }
@@ -358,6 +387,7 @@ textarea.input { min-height: 110px; direction: ltr; font-family: ui-monospace, m
   </div>
 </nav>
 
+<script src="guides.js"></script>
 <script>
 "use strict";
 
@@ -564,7 +594,7 @@ const I = {
 };
 
 /* ---------- views ---------- */
-const ui = { view: "home", side: "front", muscle: null, ex: null, metric: "max", calOff: 0, drafts: {} };
+const ui = { view: "home", side: "front", muscle: null, ex: null, metric: "max", calOff: 0, drafts: {}, guideOpen: {} };
 const $view = document.getElementById("view");
 
 function weekInfo() {
@@ -730,6 +760,35 @@ function chartSVG(points, unit) {
   </svg>`;
 }
 
+const BOOK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8.5 8h7M8.5 11.5h5"/></svg>';
+const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.6 2.6 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4a2.6 2.6 0 0 0-1.8 1.8C2 8.8 2 12 2 12s0 3.2.4 4.8a2.6 2.6 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.6 2.6 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3z"/></svg>';
+function guideHTML(ex, open) {
+  const g = (typeof GUIDES !== "undefined" && GUIDES[ex.id]) || null;
+  const yt = `https://www.youtube.com/results?search_query=${encodeURIComponent((g ? g.en : ex.name) + (g ? " proper form" : " طريقة"))}`;
+  const video = `<a href="${yt}" target="_blank" rel="noopener">${PLAY}شوف فيديو للحركة</a>`;
+  if (!g) return `<details class="card guide"${open ? " open" : ""}><summary><span class="ico">${BOOK}</span>
+      <span class="grow"><b>طريقة الأداء</b><small>تمرين خاص فيك</small></span><span class="chev">${I.chev}</span></summary>
+      <div class="body"><p class="note" style="font-size:.85rem">هاد تمرين أضفته إنت، فما في إله شرح جاهز. ركّز على حركة بطيئة ومتحكم فيها ومدى حركة كامل.</p>
+      <div class="foot">${video}</div></div></details>`;
+  const list = (arr, cls) => `<ul class="${cls}">${arr.map(t => `<li><span>${t}</span></li>`).join("")}</ul>`;
+  return `<details class="card guide"${open ? " open" : ""}>
+    <summary><span class="ico">${BOOK}</span>
+      <span class="grow"><b>طريقة الأداء</b><small>${g.steps.length} خطوات · ${g.p.join("، ")}</small></span>
+      <span class="chev">${I.chev}</span></summary>
+    <div class="body">
+      <div><h4>العضلات المستهدفة</h4><div class="musc">${g.p.map(m => `<span class="chip accent">${m}</span>`).join("")}${g.s.map(m => `<span class="chip">${m}</span>`).join("")}</div></div>
+      <div><h4>الخطوات</h4><ol>${g.steps.map(t => `<li><span>${t}</span></li>`).join("")}</ol></div>
+      <div class="two">
+        <div><h4>نصائح</h4>${list(g.tips, "good")}</div>
+        <div><h4>أخطاء شائعة</h4>${list(g.bad, "bad")}</div>
+      </div>
+      ${g.safe ? `<div class="safe"><span>${g.safe}</span></div>` : ""}
+      <div class="foot">${video}<span class="muted" style="font-size:.75rem;direction:ltr">${esc(g.en)}</span></div>
+      <p class="note">إرشادات عامة مبنية على أسس التدريب المعتمدة (NSCA وACE)، ومش بديل عن مدرب أو طبيب. إذا حسيت بألم حاد، وقّف التمرين فوراً.</p>
+    </div>
+  </details>`;
+}
+
 function deltaHTML(s, p) {
   if (!p) return "";
   const a = e1rm(s.w, s.r), b = e1rm(p.w, p.r);
@@ -789,6 +848,7 @@ function renderExercise() {
       <div class="titles"><div class="eyebrow">${MUSCLES[ex.muscle].name} · ${TYPES[ex.type]}</div><h1>${esc(ex.name)}</h1></div>
       ${best ? `<span class="chip pr">🏆 <span class="num">${fmtW(best.maxW)}</span></span>` : ""}
     </div>
+    ${guideHTML(ex, ui.guideOpen[ex.id] ?? !ses.length)}
     ${target}
     <div class="card stack">
       <div class="logger-head"><span class="setno">المجموعة<span class="n">${nextIdx}</span></span>
@@ -1093,6 +1153,10 @@ document.addEventListener("click", e => {
   }
   if (t.id === "import-go") return importJSON(document.getElementById("import-text").value);
 });
+// Remember whether the guide is expanded so logging a set does not collapse it.
+document.addEventListener("toggle", e => {
+  if (e.target.classList?.contains("guide") && ui.ex) ui.guideOpen[ui.ex] = e.target.open;
+}, true);
 document.addEventListener("keydown", e => {
   if ((e.key === "Enter" || e.key === " ") && e.target.matches?.(".hit")) { e.preventDefault(); go("muscle", { muscle: e.target.dataset.m }); }
 });
