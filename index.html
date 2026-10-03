@@ -288,6 +288,42 @@ textarea.input { min-height: 110px; direction: ltr; font-family: ui-monospace, m
 .empty svg { width: 48px; height: 48px; color: var(--surface-3); }
 .empty b { color: var(--fg); font-family: var(--font-display); font-size: 1.05rem; }
 
+/* ---------- progression coach ---------- */
+.ranges { display: flex; gap: 6px; flex-wrap: wrap; }
+.ranges button { border: 1px solid var(--line); background: rgb(255 255 255 / .04); color: var(--fg-2); border-radius: 999px; padding: 3px 12px; font-size: .95rem; }
+.ranges button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.trend { font-size: .78rem; color: var(--muted); white-space: nowrap; }
+.trend .num { font-size: 1.15rem; font-weight: 700; color: var(--fg-2); }
+.trend.up .num { color: var(--ready); } .trend.down .num { color: var(--fresh); }
+.lastline .lbl { background: transparent !important; font-family: var(--font-body) !important; font-size: .75rem !important; color: var(--muted) !important; padding-inline: 0 4px !important; }
+.recline { font-size: .8rem; color: var(--fg-2); display: inline-flex; align-items: center; gap: 6px; }
+.recline::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.recline.green::before { background: var(--ready); } .recline.yellow::before { background: var(--recover); } .recline.red::before { background: var(--fresh); }
+.target details { border-top: 1px solid rgb(255 255 255 / .08); padding-top: 10px; }
+.target details summary { cursor: pointer; font-weight: 600; font-size: .88rem; color: var(--accent-2); list-style: none; }
+.target details summary::-webkit-details-marker { display: none; }
+.target details summary::after { content: " ▾"; }
+.target details[open] summary::after { content: " ▴"; }
+.advice summary { color: var(--recover) !important; }
+.advice ul { margin: 10px 0 0; padding-inline-start: 18px; display: flex; flex-direction: column; gap: 6px; font-size: .86rem; color: var(--fg-2); line-height: 1.6; }
+.advice b { color: var(--fg); }
+.how p { font-size: .84rem; color: var(--fg-2); line-height: 1.7; margin-top: 8px; }
+.how .src { font-size: .74rem; color: var(--muted); }
+.rir { display: flex; flex-direction: column; gap: 6px; }
+.rir-btns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.rir-btns button { border: 1px solid var(--line); background: var(--bg); border-radius: var(--r-sm); padding: 7px 4px; display: flex; flex-direction: column; align-items: center; gap: 1px; color: var(--fg-2); }
+.rir-btns b { font-size: .85rem; font-weight: 600; }
+.rir-btns small { font-size: .68rem; color: var(--muted); }
+.rir-btns button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--fg); }
+.rdot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-inline-start: 4px; vertical-align: middle; }
+.rdot.e { background: var(--ready); } .rdot.m { background: var(--recover); } .rdot.h { background: var(--fresh); }
+.rec-card .input { flex: 1; min-width: 0; font-family: var(--font-num); font-size: 1.2rem; }
+.recbadge { font-size: 1.5rem; font-weight: 700; padding: 2px 12px; border-radius: 12px; }
+.recbadge.green { background: rgb(53 199 111 / .15); color: var(--ready); }
+.recbadge.yellow { background: rgb(246 178 60 / .15); color: var(--recover); }
+.recbadge.red { background: rgb(255 90 78 / .15); color: var(--fresh); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
 /* ---------- exercise photos ---------- */
 .thumb { width: 64px; height: 48px; border-radius: 12px; object-fit: cover; flex: none; background: var(--surface-3); border: 1px solid var(--line); }
 .photo { position: relative; padding: 0; overflow: hidden; aspect-ratio: 3 / 2; max-width: 100%; background: var(--surface-3); }
@@ -458,7 +494,7 @@ const PRESETS = {
 };
 
 const STORE_KEY = "gymlog.v1";
-const DEFAULTS = () => ({ custom: [], sets: [], rest: 90, goal: 4 });
+const DEFAULTS = () => ({ custom: [], sets: [], rest: 90, goal: 4, ranges: {}, recovery: {} });
 let db = DEFAULTS();
 
 function load() {
@@ -537,18 +573,101 @@ function status(m) {
 }
 const stepFor = type => type === "dumbbell" ? 1 : 2.5;
 
-function suggestion(ex) {
-  const past = sessionsOf(ex.id).filter(s => s.day !== todayKey());
-  if (!past.length) return null;
-  const last = past[past.length - 1];
-  const top = topSet(last.sets);
-  const step = stepFor(ex.type);
-  let w = top.w, r = top.r, why;
-  if (top.r >= 12) { w = top.w + step; r = 8; why = `وصلت ${top.r} عدّة آخر مرة. وقت تزيد الوزن.`; }
-  else if (top.r >= 6) { r = top.r + 1; why = "نفس الوزن، وحاول تزيد عدّة وحدة."; }
-  else { r = 6; why = "ثبّت على هالوزن لحد ما توصل 6 عدّات نظيفة."; }
-  return { last, top, w, r, why };
+/* ---------- progression coach ----------
+   Evidence-based double progression:
+   - Train inside a rep range; at the same weight, add reps until every working set reaches the top of the range.
+   - Raise the load only after reaching the top in 2 consecutive sessions (NSCA "2-for-2" rule), or in 1 session
+     rated easy (3+ reps in reserve), and never on a red recovery day.
+   - Load jump ≈ 2.5% upper body / 5% lower body (inside ACSM 2009's 2–10%), rounded to the equipment step.
+   - Two sessions below the bottom of the range at the same weight → drop ~10% and rebuild.
+   - Trend = least-squares slope of each session's best estimated 1RM (Epley), as % per week.
+   - Plateau = no new e1RM best for ≥4 sessions spanning ≥21 days. Decline = last 2 sessions >5% under the prior best. */
+const LOWER = new Set(["quads", "hamstrings", "glutes", "calves", "lower_back"]);
+const RANGES = [[5, 8], [6, 10], [8, 12], [10, 15], [12, 20]];
+function defaultRange(ex) {
+  if (["abs", "obliques", "calves", "forearms"].includes(ex.muscle)) return [12, 20];
+  return { barbell: [6, 10], machine: [8, 12], dumbbell: [8, 12], cable: [10, 15], bodyweight: [8, 12] }[ex.type] || [8, 12];
 }
+const rangeOf = ex => (db.ranges && db.ranges[ex.id]) || defaultRange(ex);
+const loadStep = type => type === "dumbbell" ? 2 : 2.5;
+const roundTo = (x, step) => Math.max(step, Math.round(x / step) * step);
+// Working sets = the sets done at the session's heaviest weight.
+function workSets(sets) { const top = Math.max(...sets.map(s => s.w)); return sets.filter(s => s.w === top); }
+const sessBest = sets => Math.max(...sets.map(s => e1rm(s.w, s.r)));
+function recoveryToday() { const v = db.recovery && db.recovery[todayKey()]; return typeof v === "number" ? v : null; }
+const recZone = v => v == null ? null : v >= 67 ? "green" : v >= 34 ? "yellow" : "red";
+
+function trendOf(ses) {
+  const pts = ses.slice(-6);
+  if (pts.length < 3) return null;
+  const t0 = dayStart(pts[0].day);
+  const xs = pts.map(p => (dayStart(p.day) - t0) / (7 * 86400000)), ys = pts.map(p => sessBest(p.sets));
+  if (xs[xs.length - 1] < 1) return null; // needs at least a week of data
+  const mx = xs.reduce((a, b) => a + b) / xs.length, my = ys.reduce((a, b) => a + b) / ys.length;
+  let num = 0, den = 0;
+  xs.forEach((x, i) => { num += (x - mx) * (ys[i] - my); den += (x - mx) ** 2; });
+  return den ? (num / den) / my * 100 : null; // % per week
+}
+function statusOf(ses) {
+  if (ses.length < 3) return null;
+  const bests = ses.map(p => sessBest(p.sets));
+  let prIdx = 0;
+  bests.forEach((b, i) => { if (b > bests[prIdx] + 0.01) prIdx = i; });
+  const n = bests.length, pct = trendOf(ses);
+  const prior = Math.max(...bests.slice(0, -2));
+  if (n >= 4 && bests[n - 1] < prior * 0.95 && bests[n - 2] < prior * 0.95)
+    return { key: "down", label: "أداء نازل", cls: "fresh", pct };
+  const since = n - 1 - prIdx, days = (dayStart(ses[n - 1].day) - dayStart(ses[prIdx].day)) / 86400000;
+  if (since >= 4 && days >= 21) return { key: "flat", label: "ثبات (بلاتو)", cls: "recover", pct, since };
+  return { key: "up", label: since === 0 ? "رقم جديد" : "بتتطور", cls: "ready", pct };
+}
+
+function coach(ex) {
+  const ses = sessionsOf(ex.id);
+  const past = ses.filter(s => s.day !== todayKey());
+  if (!past.length) return null;
+  const last = past[past.length - 1], prev = past[past.length - 2];
+  const [lo, hi] = rangeOf(ex);
+  const lw = workSets(last.sets), W = lw[0].w;
+  const minR = Math.min(...lw.map(s => s.r));
+  const allTop = lw.every(s => s.r >= hi);
+  const lastRated = lw[lw.length - 1].rir;
+  const pw = prev ? workSets(prev.sets) : null;
+  const prevTopSameW = pw && pw[0].w === W && pw.every(s => s.r >= hi);
+  const prevLowSameW = pw && pw[0].w === W && Math.min(...pw.map(s => s.r)) < lo;
+  const rec = recoveryToday(), zone = recZone(rec);
+  const lower = LOWER.has(ex.muscle), pct = lower ? 5 : 2.5;
+  let action, w = W, r, why, rule = "";
+  if (allTop && (prevTopSameW || lastRated === "e")) {
+    const inc = roundTo(Math.max(W, 20) * pct / 100, loadStep(ex.type));
+    if (zone === "red") {
+      action = "hold"; r = hi;
+      why = `جاهز تزيد الوزن، بس تعافيك اليوم أحمر (${rec}%). ثبّت على نفس الوزن اليوم وزيد بالجلسة الجاية.`;
+    } else {
+      action = "up"; w = W + inc; r = lo;
+      why = prevTopSameW
+        ? `وصلت ${hi} عدّة بكل المجموعات جلستين ورا بعض. وقت تكسر الوزن: زيد ${fmtW(inc)} كغ (حوالي ${pct}%) وارجع لـ ${lo} عدّات.`
+        : `وصلت ${hi} عدّة وكانت سهلة (3+ عدّات باقية). زيد ${fmtW(inc)} كغ وارجع لـ ${lo} عدّات.`;
+      rule = prevTopSameW ? "قاعدة 2 لـ 2" : "عدّات باقية";
+    }
+  } else if (allTop) {
+    action = "confirm"; r = hi;
+    why = `وصلت أعلى النطاق (${hi}) بكل المجموعات. أكّدها جلسة كمان على نفس الوزن، وإذا نجحت بنزيد الوزن.`;
+    rule = "قاعدة 2 لـ 2";
+  } else if (minR < lo && prevLowSameW) {
+    action = "down"; w = Math.max(0, W - roundTo(W * 0.1, loadStep(ex.type))); r = lo;
+    why = `جلستين تحت ${lo} عدّات على هالوزن. نزّل حوالي 10% وابني العدّات من جديد.`;
+  } else {
+    action = "reps"; r = Math.min(hi, Math.max(lo, minR + 1));
+    why = `ضل على ${fmtW(W)} كغ وزيد عدّة على المجموعة الأضعف، لحد ما توصل ${hi} عدّة بكل المجموعات.`;
+    rule = "تدرّج مزدوج";
+  }
+  if (zone === "green" && (action === "reps" || action === "confirm")) why += " تعافيك أخضر اليوم، يوم ممتاز تضغط فيه.";
+  if (zone === "yellow" && action === "up") why += " تعافيك أصفر: إذا حسيت الوزن تقيل، ارجع للوزن القديم.";
+  return { last, w, r, why, action, rule, lo, hi, status: statusOf(past), pct: trendOf(past), rec, zone };
+}
+// Kept for callers that only need the next target.
+const suggestion = ex => coach(ex);
 
 /* ---------- body map ---------- */
 // Paths are drawn for the figure's right half (x ≤ 100) and mirrored across x = 100.
@@ -629,6 +748,39 @@ function weekInfo() {
 const fmtVol = v => v >= 10000 ? (v / 1000).toFixed(1) + "k" : v.toLocaleString("en");
 function greeting() { const h = new Date().getHours(); return h < 12 ? "صباح الخير" : h < 18 ? "يعطيك العافية" : "مساء الخير"; }
 
+function recoveryCardHTML() {
+  const v = recoveryToday(), z = recZone(v);
+  const T = {
+    green: ["تعافي أخضر", "يوم مناسب تضغط فيه وتكسر أوزان."],
+    yellow: ["تعافي أصفر", "تمرن عادي، وما تجبر حالك تكسر وزن إذا حسيت إنه تقيل."],
+    red: ["تعافي أحمر", "جسمك محتاج راحة: خفّف الحجم أو تمرن خفيف. المدرب ما رح يقترح كسر وزن اليوم."],
+  };
+  return `<form class="card rec-card stack" id="rec-form" style="gap:10px">
+    <div class="spread"><div><div class="eyebrow">WHOOP · تعافي اليوم</div><h2>${z ? T[z][0] : "قديش تعافيك اليوم؟"}</h2></div>
+      ${z ? `<span class="recbadge ${z}"><span class="num">${v}%</span></span>` : ""}</div>
+    <p class="muted" style="font-size:.85rem">${z ? T[z][1] : "اكتب نسبة التعافي من تطبيق WHOOP، والمدرب بيعدّل اقتراحاته حسبها."}</p>
+    <div class="row" style="flex-wrap:nowrap"><label class="sr" for="rec-input">نسبة التعافي</label>
+      <input class="input" id="rec-input" type="number" inputmode="numeric" min="0" max="100" placeholder="مثلاً 72" value="${v ?? ""}">
+      <button class="btn" type="submit" style="flex:none">${v == null ? "حفظ" : "تعديل"}</button></div>
+  </form>`;
+}
+function progressReportHTML() {
+  const rows = [];
+  for (const ex of allExercises()) {
+    const ses = sessionsOf(ex.id);
+    const st = statusOf(ses);
+    if (st) rows.push({ ex, st, pct: trendOf(ses) });
+  }
+  if (!rows.length) return "";
+  const order = { down: 0, flat: 1, up: 2 };
+  rows.sort((a, b) => order[a.st.key] - order[b.st.key] || (b.pct ?? 0) - (a.pct ?? 0));
+  return `<div class="section-h"><h2>تقرير التطور</h2><span class="muted" style="font-size:.78rem">آخر 6 جلسات لكل تمرين</span></div>
+  <div class="list">${rows.slice(0, 6).map(({ ex, st, pct }) => `<button class="item" data-ex="${ex.id}">
+      ${thumbHTML(ex)}
+      <span class="grow"><b>${esc(ex.name)}</b><small>${MUSCLES[ex.muscle].name}${pct != null ? ` · <span class="num">${pct > 0 ? "+" : ""}${pct.toFixed(1)}%</span> بالأسبوع` : ""}</small></span>
+      <span class="chip ${st.cls}">${st.label}</span></button>`).join("")}</div>`;
+}
+
 function renderHome() {
   const w = weekInfo();
   const goal = db.goal || 4;
@@ -669,6 +821,9 @@ function renderHome() {
       </div>
       <div class="week">${w.days.map(d => `<div class="wd${d.on ? " on" : ""}${d.today ? " today" : ""}${d.future ? " future" : ""}"><i>${d.d}</i>${d.name}</div>`).join("")}</div>
     </div>
+
+    ${recoveryCardHTML()}
+    ${progressReportHTML()}
 
     <div class="card map-card stack" style="gap:6px">
       <div class="map-head">
@@ -849,19 +1004,47 @@ function renderExercise() {
   const todaySets = today ? today.sets : [];
   const nextIdx = todaySets.length + 1;
 
+  const ACT = { up: ["كسر وزن", "ready"], confirm: ["تأكيد", "accent"], reps: ["زيد عدّات", "accent"], hold: ["ثبّت اليوم", "recover"], down: ["خفّف الوزن", "fresh"] };
+  const [lo, hi] = rangeOf(ex);
+  const rangeChips = `<div class="ranges" role="group" aria-label="نطاق العدّات">${RANGES.map(([a, b]) =>
+    `<button type="button" data-range="${a}-${b}" aria-pressed="${a === lo && b === hi}"><span class="num">${a}–${b}</span></button>`).join("")}</div>`;
+  const trendTxt = p => p == null ? "" : `<span class="trend ${p >= 0.25 ? "up" : p <= -0.25 ? "down" : ""}"><span class="num">${p > 0 ? "+" : ""}${p.toFixed(1)}%</span> بالأسبوع</span>`;
+  const advice = sug && sug.status && (sug.status.key === "flat" || sug.status.key === "down") ? `<details class="advice"${sug.status.key === "down" ? " open" : ""}>
+      <summary>${sug.status.key === "down" ? "أداءك نازل جلستين ورا بعض. شو أعمل؟" : `ما في رقم جديد من ${sug.status.since} جلسات. شو أعمل؟`}</summary>
+      <ul>
+        ${sug.status.key === "down" ? "<li><b>غالباً إرهاق متراكم.</b> خذ أسبوع تخفيف: نفس التمارين بنص عدد المجموعات تقريباً ووزن أخف بحوالي 10%، وبعدها ارجع.</li>" : ""}
+        <li><b>النوم والأكل أول:</b> 7 لـ 9 ساعات نوم، وبروتين حوالي 1.6 غرام لكل كيلو من وزنك باليوم.</li>
+        <li><b>زيد الحجم شوي:</b> مجموعة وحدة زيادة بالأسبوع لهالعضلة.</li>
+        <li><b>غيّر نطاق العدّات</b> لـ 4 لـ 6 أسابيع (مثلاً من 8–12 لـ 6–10).</li>
+        ${sug.status.key === "flat" ? "<li><b>أسبوع تخفيف</b> إذا صارلك أكثر من 6 لـ 8 أسابيع بتضغط بدون راحة.</li>" : ""}
+        <li><b>بدّل التمرين</b> بنسخة قريبة لنفس العضلة لفترة.</li>
+      </ul></details>` : "";
   const target = sug ? `<div class="card target stack" style="gap:10px">
-      <div class="spread"><span class="eyebrow">هدف اليوم</span><span class="chip accent">آخر جلسة ${daysAgo(sug.last.day)}</span></div>
-      <div class="big"><span class="num">${fmtW(sug.w)}</span><small>كغ ×</small><span class="num">${sug.r}</span></div>
+      <div class="spread"><span class="eyebrow">مدرب التطور</span>
+        <span class="row" style="gap:6px">${sug.status ? `<span class="chip ${sug.status.cls}">${sug.status.label}</span>` : ""}<span class="chip ${ACT[sug.action][1]}">${ACT[sug.action][0]}</span></span></div>
+      <div class="spread" style="align-items:flex-end">
+        <div class="big"><span class="num">${fmtW(sug.w)}</span><small>كغ ×</small><span class="num">${sug.r}</span></div>
+        ${trendTxt(sug.pct)}
+      </div>
       <p class="why">${sug.why}</p>
-      <div class="lastline">${sug.last.sets.map(s => `<span>${fmtW(s.w)}×${s.r}</span>`).join("")}</div>
-    </div>` : `<div class="card target stack" style="gap:6px"><span class="eyebrow">أول مرة بهالتمرين</span>
-      <h2>ابدأ بوزن مريح وركّز على الأداء</h2><p class="why">من الجلسة الجاية رح نقترح عليك هدف حسب أدائك.</p></div>`;
+      ${sug.rec != null ? `<p class="recline ${sug.zone}">تعافي WHOOP اليوم: <span class="num">${sug.rec}%</span></p>` : ""}
+      <div class="lastline"><span class="lbl">آخر جلسة · ${daysAgo(sug.last.day)}</span>${sug.last.sets.map(s => `<span>${fmtW(s.w)}×${s.r}</span>`).join("")}</div>
+      <div class="stack" style="gap:6px"><span class="eyebrow">نطاق العدّات لهالتمرين</span>${rangeChips}</div>
+      ${advice}
+      <details class="how"><summary>كيف بنحسب؟</summary>
+        <p>بتشتغل ضمن نطاق عدّات. على نفس الوزن بتزيد العدّات لحد ما توصل أعلى النطاق بكل المجموعات. إذا عملتها <b>جلستين ورا بعض</b> (أو مرة وحدة وكانت سهلة)، بنزيد الوزن حوالي <b>2.5%</b> للجزء العلوي و<b>5%</b> للأرجل، وبترجع لأسفل النطاق. إذا نزلت تحت النطاق جلستين، بنخفّف 10%.</p>
+        <p>التطور بنقيسه بأقصى تكرار تقديري (1RM) لكل جلسة. «ثبات» يعني ما في رقم جديد من 4 جلسات وأكثر من 3 أسابيع.</p>
+        <p class="src">المراجع: موقف ACSM عن نماذج التدرّج (2009)، قاعدة «2 لـ 2» من NSCA، مقياس العدّات الباقية (Helms وزملاؤه 2016)، وتوصية البروتين (Morton وزملاؤه 2018).</p>
+      </details>
+    </div>` : `<div class="card target stack" style="gap:8px"><span class="eyebrow">أول مرة بهالتمرين</span>
+      <h2>ابدأ بوزن بتقدر تعمل فيه ${lo} لـ ${hi} عدّة بتكنيك نظيف</h2><p class="why">من الجلسة الجاية مدرب التطور بيقلك متى تزيد العدّات ومتى تكسر الوزن.</p>
+      <div class="stack" style="gap:6px"><span class="eyebrow">نطاق العدّات لهالتمرين</span>${rangeChips}</div></div>`;
 
   const rows = todaySets.map((s, i) => {
     const p = prevSes?.sets[i];
     return `<tr class="done"><td><span class="idx">${i + 1}</span></td>
       <td class="prev">${p ? `${fmtW(p.w)}×${p.r}` : "—"}</td>
-      <td class="n">${fmtW(s.w)}</td><td class="n">${s.r}</td>
+      <td class="n">${fmtW(s.w)}</td><td class="n">${s.r}${s.rir ? `<i class="rdot ${s.rir}" title="${{ e: "سهلة", m: "متوسطة", h: "للفشل" }[s.rir]}"></i>` : ""}</td>
       <td>${deltaHTML(s, p)}</td>
       <td><button class="x" data-del="${s.id}" aria-label="حذف المجموعة ${i + 1}">${I.x}</button></td></tr>`;
   }).join("");
@@ -903,6 +1086,9 @@ function renderExercise() {
       </div>
       <div class="quick" aria-label="زيادة سريعة للوزن">${[-5, -1.25, 1.25, 5, 10].map(v => `<button type="button" data-step="w:${v}">${v > 0 ? "+" : "−"}${Math.abs(v)}</button>`).join("")}</div>
       ${ex.type === "barbell" ? `<div id="plates">${platesHTML(d.w)}</div>` : ""}
+      <div class="rir" role="group" aria-label="صعوبة المجموعة (اختياري)"><span class="eyebrow">قديش كانت صعبة؟ (اختياري)</span>
+        <div class="rir-btns">${[["e", "سهلة", "3+ عدّات باقية"], ["m", "متوسطة", "1–2 باقيين"], ["h", "للفشل", "ولا عدّة"]].map(([k, t, sub]) =>
+          `<button type="button" data-rir="${k}" aria-pressed="${d.rir === k}"><b>${t}</b><small>${sub}</small></button>`).join("")}</div></div>
       <button class="btn primary" type="button" id="log-set">${I.check} سجّل المجموعة</button>
       ${rows || upcoming ? `<table class="table"><thead><tr><th>#</th><th>السابق</th><th>كغ</th><th>عدّات</th><th></th><th></th></tr></thead><tbody>${rows}${upcoming}</tbody></table>` : ""}
     </div>
@@ -992,6 +1178,11 @@ function renderSettings() {
       <div class="field"><label class="eyebrow" for="goal-sel">هدف التمرين الأسبوعي</label><select class="input" id="goal-sel">${gopts}</select></div>
       <div class="field"><label class="eyebrow" for="rest-sel">مدة الراحة بين المجموعات</label><select class="input" id="rest-sel">${opts}</select></div>
       <small class="muted">مؤقت الراحة بيشتغل لحاله بعد كل مجموعة.</small>
+    </div>
+    <div class="card stack">
+      <div><div class="eyebrow">الأجهزة</div><h3>WHOOP</h3></div>
+      <small class="muted">هلأ بتدخل نسبة التعافي بإيدك من الصفحة الرئيسية، والمدرب بيستعملها: أحمر (أقل من 34%) بيوقّف اقتراح كسر الوزن، وأخضر (67% وفوق) بيشجعك تضغط.</small>
+      <small class="muted">الربط التلقائي مع WHOOP بيحتاج تسجيل تطبيق مطوّر عند WHOOP وسيرفر صغير يحفظ المفتاح السري، وهاد ممكن نضيفه لاحقاً.</small>
     </div>
     <div class="card stack">
       <div><div class="eyebrow">بياناتك</div><h3>نسخة احتياطية</h3></div>
@@ -1102,7 +1293,10 @@ function logSet() {
   const d = readDraft();
   const ex = exById(ui.ex);
   const prev = bestOf(ex.id);
-  db.sets.push({ id: uid(), ex: ex.id, w: d.w, r: d.r, t: Date.now() }); save();
+  const set = { id: uid(), ex: ex.id, w: d.w, r: d.r, t: Date.now() };
+  if (d.rir) set.rir = d.rir;
+  d.rir = null;
+  db.sets.push(set); save();
   // Unlock audio on this tap so the timer beep can play later.
   try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume?.(); } catch (e) {}
   try { navigator.vibrate?.(15); } catch (e) {}
@@ -1117,7 +1311,7 @@ function deleteSet(id) {
   const [removed] = db.sets.splice(i, 1); save(); refresh();
   toast("انحذفت المجموعة", () => { db.sets.push(removed); save(); refresh(); });
 }
-const exportJSON = () => JSON.stringify({ app: "gym-log", version: 1, exported: new Date().toISOString(), custom: db.custom, sets: db.sets, rest: db.rest, goal: db.goal });
+const exportJSON = () => JSON.stringify({ app: "gym-log", version: 1, exported: new Date().toISOString(), custom: db.custom, sets: db.sets, rest: db.rest, goal: db.goal, ranges: db.ranges, recovery: db.recovery });
 function importJSON(text) {
   try {
     const data = JSON.parse(text);
@@ -1126,6 +1320,8 @@ function importJSON(text) {
     db.sets = data.sets.filter(s => s && s.ex && typeof s.w === "number" && typeof s.r === "number" && typeof s.t === "number");
     if (data.rest) db.rest = +data.rest;
     if (data.goal) db.goal = +data.goal;
+    db.ranges = data.ranges && typeof data.ranges === "object" ? data.ranges : {};
+    db.recovery = data.recovery && typeof data.recovery === "object" ? data.recovery : {};
     save(); refresh();
     toast(`تم الاسترجاع: <span class="num">${db.sets.length}</span> مجموعة`);
   } catch (e) { toast("البيانات مش صالحة. تأكد إنك نسخت النص كامل."); }
@@ -1141,7 +1337,7 @@ const confirmActions = {
 };
 
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-go],[data-side],[data-m],[data-muscle],[data-ex],[data-back],[data-step],[data-del],[data-confirm],[data-metric],[data-cal],[data-jump],#log-set,#export-copy,#export-file,#import-go");
+  const t = e.target.closest("[data-range],[data-rir],[data-go],[data-side],[data-m],[data-muscle],[data-ex],[data-back],[data-step],[data-del],[data-confirm],[data-metric],[data-cal],[data-jump],#log-set,#export-copy,#export-file,#import-go");
   if (!t) return;
   if (t.dataset.go) return go(t.dataset.go);
   if (t.dataset.side) { ui.side = t.dataset.side; return refresh(); }
@@ -1160,6 +1356,13 @@ document.addEventListener("click", e => {
     if (k === "w") { const p = document.getElementById("plates"); if (p) p.innerHTML = platesHTML(d.w); }
     return;
   }
+  if (t.dataset.range) {
+    const [lo, hi] = t.dataset.range.split("-").map(Number);
+    (db.ranges ||= {})[ui.ex] = [lo, hi]; save();
+    delete ui.drafts[ui.ex];
+    return refresh();
+  }
+  if (t.dataset.rir) { const d = readDraft(); d.rir = d.rir === t.dataset.rir ? null : t.dataset.rir; return refresh(); }
   if (t.dataset.del) return deleteSet(t.dataset.del);
   if (t.dataset.confirm) {
     if (!t.classList.contains("armed")) {
@@ -1213,6 +1416,19 @@ document.addEventListener("change", e => {
   }
 });
 document.addEventListener("submit", e => {
+  if (e.target.id === "rec-form") {
+    e.preventDefault();
+    const raw = document.getElementById("rec-input").value.trim();
+    db.recovery ||= {};
+    if (raw === "") delete db.recovery[todayKey()];
+    else {
+      const v = Math.round(+raw);
+      if (isNaN(v) || v < 0 || v > 100) return toast("اكتب رقم بين 0 و 100.");
+      db.recovery[todayKey()] = v;
+    }
+    save(); refresh(); toast(raw === "" ? "انمسح تعافي اليوم" : "انحفظ تعافي اليوم");
+    return;
+  }
   if (e.target.id !== "add-ex-form") return;
   e.preventDefault();
   const name = document.getElementById("new-ex-name").value.trim();
