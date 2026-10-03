@@ -485,28 +485,28 @@ const MUSCLES = {
 const TYPES = { barbell: "بار", dumbbell: "دمبل", machine: "جهاز", cable: "كيبل", bodyweight: "وزن الجسم" };
 
 const PRESETS = {
-  chest_upper: [["بنش مائل بار", "barbell"], ["بنش مائل دمبل", "dumbbell"], ["تفتيح مائل دمبل", "dumbbell"], ["كيبل كروس من تحت لفوق", "cable"], ["بنش مائل سميث", "machine"], ["جهاز ضغط صدر مائل", "machine"]],
-  chest_mid:   [["بنش مستوي بار", "barbell"], ["بنش مستوي دمبل", "dumbbell"], ["جهاز ضغط صدر", "machine"], ["بيك ديك (فراشة)", "machine"], ["ضغط (بوش أب)", "bodyweight"], ["تفتيح مستوي دمبل", "dumbbell"]],
+  chest_upper: [["بنش مائل بار", "barbell"], ["بنش مائل دمبل", "dumbbell"], ["تفتيح مائل دمبل", "dumbbell"], ["كيبل كروس من تحت لفوق", "cable"], ["بنش مائل سميث", "machine"], ["جهاز ضغط صدر مائل", "machine"], ["ضغط صدر مائل كيبل", "cable"], ["تفتيح مائل كيبل", "cable"]],
+  chest_mid:   [["بنش مستوي بار", "barbell"], ["بنش مستوي دمبل", "dumbbell"], ["جهاز ضغط صدر", "machine"], ["بيك ديك (فراشة)", "machine"], ["ضغط (بوش أب)", "bodyweight"], ["تفتيح مستوي دمبل", "dumbbell"], ["ضغط صدر كيبل واقف", "cable"]],
   chest_lower: [["بنش مقلوب بار", "barbell"], ["متوازي (ديبس)", "bodyweight"], ["كيبل كروس من فوق لتحت", "cable"], ["بنش مقلوب دمبل", "dumbbell"]],
-  delt_front:  [["ضغط أكتاف بار", "barbell"], ["ضغط أكتاف دمبل", "dumbbell"], ["رفرفة أمامي دمبل", "dumbbell"], ["أرنولد برس", "dumbbell"], ["جهاز ضغط أكتاف", "machine"]],
+  delt_front:  [["ضغط أكتاف بار", "barbell"], ["ضغط أكتاف دمبل", "dumbbell"], ["رفرفة أمامي دمبل", "dumbbell"], ["أرنولد برس", "dumbbell"], ["جهاز ضغط أكتاف", "machine"], ["ضغط أكتاف كيبل", "cable"], ["رفرفة أمامي كيبل", "cable"]],
   delt_side:   [["رفرفة جانبي دمبل", "dumbbell"], ["رفرفة جانبي كيبل", "cable"], ["جهاز رفرفة جانبي", "machine"], ["سحب عمودي بار (أبرايت رو)", "barbell"]],
   delt_rear:   [["رفرفة خلفي دمبل", "dumbbell"], ["جهاز فراشة عكسي", "machine"], ["فيس بول", "cable"], ["رفرفة خلفي كيبل", "cable"]],
-  biceps:      [["بايسبس بار", "barbell"], ["بايسبس دمبل", "dumbbell"], ["هامر", "dumbbell"], ["بايسبس كيبل", "cable"], ["بايسبس ارتكاز (بريتشر)", "barbell"], ["بايسبس دمبل على بنش مائل", "dumbbell"], ["بايسبس تركيز", "dumbbell"]],
-  triceps:     [["تراي كيبل حبل", "cable"], ["فرنش برس", "barbell"], ["تراي فوق الراس دمبل", "dumbbell"], ["بنش ضيق", "barbell"], ["تراي كيبل بار", "cable"], ["متوازي تراي", "bodyweight"], ["كيك باك دمبل", "dumbbell"], ["تراي كيبل فوق الراس", "cable"]],
-  forearms:    [["رسغ بار", "barbell"], ["رسغ عكسي", "barbell"]],
-  abs:         [["كرنش", "bodyweight"], ["رفع رجلين معلّق", "bodyweight"], ["كرنش كيبل", "cable"], ["بلانك (بالثواني)", "bodyweight"], ["عجلة البطن", "bodyweight"], ["كرنش عكسي", "bodyweight"]],
-  obliques:    [["روسيان تويست", "bodyweight"], ["ميلان جانبي دمبل", "dumbbell"], ["وود تشوب كيبل", "cable"], ["كرنش دراجة", "bodyweight"]],
-  traps:       [["شرغ بار", "barbell"], ["شرغ دمبل", "dumbbell"]],
-  upper_back:  [["تجديف بار", "barbell"], ["تجديف دمبل", "dumbbell"], ["تجديف كيبل جالس", "cable"], ["تجديف T-بار", "machine"], ["تجديف جهاز", "machine"], ["تجديف دمبل على بنش مائل", "dumbbell"]],
-  lats:        [["سحب أمامي", "cable"], ["عقلة", "bodyweight"], ["بول أوفر كيبل", "cable"], ["عقلة قبضة عكسية (تشن أب)", "bodyweight"], ["سحب أمامي قبضة ضيقة", "cable"]],
+  biceps:      [["بايسبس بار", "barbell"], ["بايسبس دمبل", "dumbbell"], ["هامر", "dumbbell"], ["بايسبس كيبل", "cable"], ["بايسبس ارتكاز (بريتشر)", "barbell"], ["بايسبس دمبل على بنش مائل", "dumbbell"], ["بايسبس تركيز", "dumbbell"], ["هامر كيبل حبل", "cable"]],
+  triceps:     [["تراي كيبل حبل", "cable"], ["فرنش برس", "barbell"], ["تراي فوق الراس دمبل", "dumbbell"], ["بنش ضيق", "barbell"], ["تراي كيبل بار", "cable"], ["متوازي تراي", "bodyweight"], ["كيك باك دمبل", "dumbbell"], ["تراي كيبل فوق الراس", "cable"], ["تراي كيبل مستلقي", "cable"]],
+  forearms:    [["رسغ بار", "barbell"], ["رسغ عكسي", "barbell"], ["رسغ كيبل", "cable"]],
+  abs:         [["كرنش", "bodyweight"], ["رفع رجلين معلّق", "bodyweight"], ["كرنش كيبل", "cable"], ["بلانك (بالثواني)", "bodyweight"], ["عجلة البطن", "bodyweight"], ["كرنش عكسي", "bodyweight"], ["كرنش عكسي كيبل", "cable"]],
+  obliques:    [["روسيان تويست", "bodyweight"], ["ميلان جانبي دمبل", "dumbbell"], ["وود تشوب كيبل", "cable"], ["كرنش دراجة", "bodyweight"], ["بالوف برس", "cable"]],
+  traps:       [["شرغ بار", "barbell"], ["شرغ دمبل", "dumbbell"], ["شرغ كيبل", "cable"]],
+  upper_back:  [["تجديف بار", "barbell"], ["تجديف دمبل", "dumbbell"], ["تجديف كيبل جالس", "cable"], ["تجديف T-بار", "machine"], ["تجديف جهاز", "machine"], ["تجديف دمبل على بنش مائل", "dumbbell"], ["تجديف كيبل يد وحدة", "cable"]],
+  lats:        [["سحب أمامي", "cable"], ["عقلة", "bodyweight"], ["بول أوفر كيبل", "cable"], ["عقلة قبضة عكسية (تشن أب)", "bodyweight"], ["سحب أمامي قبضة ضيقة", "cable"], ["سحب كيبل يد وحدة", "cable"]],
   lower_back:  [["ديدليفت", "barbell"], ["ظهر سفلي (هايبر)", "bodyweight"], ["جود مورنينج", "barbell"]],
-  glutes:      [["هيب ثرست بار", "barbell"], ["بلغاري سكوات", "dumbbell"], ["جهاز أبداكتور", "machine"], ["كيك باك كيبل", "cable"], ["جسر المؤخرة بار", "barbell"], ["سومو ديدليفت", "barbell"]],
-  quads:       [["سكوات بار", "barbell"], ["ليج برس", "machine"], ["ليج إكستنشن", "machine"], ["هاك سكوات", "machine"], ["لانجز دمبل", "dumbbell"], ["سكوات أمامي", "barbell"], ["جوبلت سكوات", "dumbbell"], ["سكوات سميث", "machine"], ["طلوع درج دمبل (ستيب أب)", "dumbbell"]],
-  hamstrings:  [["ليج كيرل", "machine"], ["رومانيان ديدليفت", "barbell"], ["ليج كيرل جالس", "machine"], ["ديدليفت أرجل مفرودة دمبل", "dumbbell"]],
-  calves:      [["سمانة واقف", "machine"], ["سمانة جالس", "machine"], ["سمانة على الليج برس", "machine"]],
+  glutes:      [["هيب ثرست بار", "barbell"], ["بلغاري سكوات", "dumbbell"], ["جهاز أبداكتور", "machine"], ["كيك باك كيبل", "cable"], ["جسر المؤخرة بار", "barbell"], ["سومو ديدليفت", "barbell"], ["بول ثرو كيبل", "cable"], ["أبداكشن كيبل واقف", "cable"]],
+  quads:       [["سكوات بار", "barbell"], ["ليج برس", "machine"], ["ليج إكستنشن", "machine"], ["هاك سكوات", "machine"], ["لانجز دمبل", "dumbbell"], ["سكوات أمامي", "barbell"], ["جوبلت سكوات", "dumbbell"], ["سكوات سميث", "machine"], ["طلوع درج دمبل (ستيب أب)", "dumbbell"], ["سبليت سكوات بالبار", "barbell"]],
+  hamstrings:  [["ليج كيرل", "machine"], ["رومانيان ديدليفت", "barbell"], ["ليج كيرل جالس", "machine"], ["ديدليفت أرجل مفرودة دمبل", "dumbbell"], ["ليج كيرل كيبل واقف", "cable"]],
+  calves:      [["سمانة واقف", "machine"], ["سمانة جالس", "machine"], ["سمانة على الليج برس", "machine"], ["سمانة واقف بالبار", "barbell"]],
 };
 
-const APP_VERSION = "2026.10.04-2";
+const APP_VERSION = "2026.10.04-3";
 const STORE_KEY = "gymlog.v1";
 const DEFAULTS = () => ({ custom: [], sets: [], rest: 90, goal: 4, ranges: {}, recovery: {} });
 let db = DEFAULTS();
@@ -530,7 +530,21 @@ function allExercises() {
   return list.concat(db.custom.map(c => ({ ...c, custom: true })));
 }
 const exById = id => allExercises().find(e => e.id === id);
-const exercisesOf = m => allExercises().filter(e => e.muscle === m);
+// Exercises doable on a Speediance Gym Monster (two adjustable cable arms, bar, handles, rope, ankle straps, bench).
+const GM_IDS = new Set([
+  "chest_upper-0", "chest_upper-3", "chest_upper-6", "chest_upper-7", "chest_mid-0", "chest_mid-4", "chest_mid-6", "chest_lower-2",
+  "delt_front-0", "delt_front-5", "delt_front-6", "delt_side-1", "delt_side-3", "delt_rear-2", "delt_rear-3",
+  "biceps-0", "biceps-3", "biceps-7", "triceps-0", "triceps-1", "triceps-3", "triceps-4", "triceps-7", "triceps-8",
+  "forearms-0", "forearms-1", "forearms-2", "abs-0", "abs-2", "abs-3", "abs-5", "abs-6",
+  "obliques-0", "obliques-2", "obliques-3", "obliques-4", "traps-0", "traps-2",
+  "upper_back-0", "upper_back-2", "upper_back-6", "lats-0", "lats-2", "lats-4", "lats-5",
+  "lower_back-0", "lower_back-2", "glutes-0", "glutes-3", "glutes-4", "glutes-5", "glutes-6", "glutes-7",
+  "quads-0", "quads-5", "quads-9", "hamstrings-1", "hamstrings-4", "calves-3",
+]);
+const isGM = () => db.equip === "gm";
+const visibleEx = e => !isGM() || e.custom || GM_IDS.has(e.id);
+// Lists show what the current equipment allows; history and recovery always count every exercise.
+const exercisesOf = (m, all) => allExercises().filter(e => e.muscle === m && (all || visibleEx(e)));
 
 /* ---------- helpers ---------- */
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -571,7 +585,7 @@ function bestOf(exId) {
 }
 const topSet = sets => sets.reduce((a, s) => (!a || s.w > a.w || (s.w === a.w && s.r > a.r)) ? s : a, null);
 function muscleLast(m) {
-  const ids = new Set(exercisesOf(m).map(e => e.id));
+  const ids = new Set(exercisesOf(m, true).map(e => e.id));
   let t = 0;
   for (const s of db.sets) if (ids.has(s.ex) && s.t > t) t = s.t;
   return t;
@@ -585,7 +599,7 @@ function status(m) {
   if (h < 24 * 7) return { cls: "ready", label: "جاهزة" };
   return { cls: "", label: "صارلها زمان" };
 }
-const stepFor = type => type === "dumbbell" ? 1 : 2.5;
+const stepFor = type => isGM() ? 0.5 : type === "dumbbell" ? 1 : 2.5;
 
 /* ---------- progression coach ----------
    Evidence-based double progression:
@@ -603,7 +617,7 @@ function defaultRange(ex) {
   return { barbell: [6, 10], machine: [8, 12], dumbbell: [8, 12], cable: [10, 15], bodyweight: [8, 12] }[ex.type] || [8, 12];
 }
 const rangeOf = ex => (db.ranges && db.ranges[ex.id]) || defaultRange(ex);
-const loadStep = type => type === "dumbbell" ? 2 : 2.5;
+const loadStep = type => isGM() ? 0.5 : type === "dumbbell" ? 2 : 2.5;
 const roundTo = (x, step) => Math.max(step, Math.round(x / step) * step);
 // Working sets = the sets done at the session's heaviest weight.
 function workSets(sets) { const top = Math.max(...sets.map(s => s.w)); return sets.filter(s => s.w === top); }
@@ -988,7 +1002,7 @@ function renderMuscle() {
     </button>`;
   }).join("");
   const typeOpts = Object.entries(TYPES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
-  const total = exercisesOf(ui.muscle).reduce((a, e) => a + setsOf(e.id).length, 0);
+  const total = exercisesOf(ui.muscle, true).reduce((a, e) => a + setsOf(e.id).length, 0);
   return `<div class="stack enter">
     <div class="topbar">
       <button class="iconbtn" data-back aria-label="رجوع">${I.back}</button>
@@ -1118,7 +1132,7 @@ function renderExercise() {
   const best = bestOf(ex.id);
   const lastAny = ses.length ? ses[ses.length - 1].sets.slice(-1)[0] : null;
   const d = ui.drafts[ex.id] || (ui.drafts[ex.id] = {
-    w: sug ? sug.w : lastAny ? lastAny.w : (ex.type === "barbell" ? 20 : ex.type === "bodyweight" ? 0 : 10),
+    w: sug ? sug.w : lastAny ? lastAny.w : (ex.type === "bodyweight" ? 0 : ex.type === "barbell" && !isGM() ? 20 : 10),
     r: sug ? sug.r : lastAny ? lastAny.r : 10,
   });
   const step = stepFor(ex.type);
@@ -1195,7 +1209,7 @@ function renderExercise() {
         ${prevSes?.sets[todaySets.length] ? `<span class="muted" style="font-size:.8rem">المرة الماضية: <span class="num">${fmtW(prevSes.sets[todaySets.length].w)}×${prevSes.sets[todaySets.length].r}</span></span>` : ""}</div>
       <div class="entry">
         <div class="stepper"><div class="ctl">
-          <label class="unit" for="w-input">الوزن · كغ${ex.type === "dumbbell" ? " (الوحدة)" : ex.type === "bodyweight" ? " (إضافي)" : ""}</label>
+          <label class="unit" for="w-input">الوزن · كغ${isGM() && ex.type !== "bodyweight" ? " (الكلي بالجهاز)" : ex.type === "dumbbell" ? " (الوحدة)" : ex.type === "bodyweight" ? " (إضافي)" : ""}</label>
           <input id="w-input" type="number" inputmode="decimal" step="any" min="0" value="${fmtW(d.w)}">
           <div class="btns"><button type="button" data-step="w:-${step}" aria-label="نقّص الوزن">−</button><button type="button" data-step="w:${step}" aria-label="زيد الوزن">+</button></div>
         </div></div>
@@ -1205,8 +1219,8 @@ function renderExercise() {
           <div class="btns"><button type="button" data-step="r:-1" aria-label="نقّص العدّات">−</button><button type="button" data-step="r:1" aria-label="زيد العدّات">+</button></div>
         </div></div>
       </div>
-      <div class="quick" aria-label="زيادة سريعة للوزن">${[-5, -1.25, 1.25, 5, 10].map(v => `<button type="button" data-step="w:${v}">${v > 0 ? "+" : "−"}${Math.abs(v)}</button>`).join("")}</div>
-      ${ex.type === "barbell" ? `<div id="plates">${platesHTML(d.w)}</div>` : ""}
+      <div class="quick" aria-label="زيادة سريعة للوزن">${(isGM() ? [-2.5, -0.5, 0.5, 2.5, 5] : [-5, -1.25, 1.25, 5, 10]).map(v => `<button type="button" data-step="w:${v}">${v > 0 ? "+" : "−"}${Math.abs(v)}</button>`).join("")}</div>
+      ${ex.type === "barbell" && !isGM() ? `<div id="plates">${platesHTML(d.w)}</div>` : ""}
       <div class="rir" role="group" aria-label="صعوبة المجموعة (اختياري)"><span class="eyebrow">قديش كانت صعبة؟ (اختياري)</span>
         <div class="rir-btns">${[["e", "سهلة", "3+ عدّات باقية"], ["m", "متوسطة", "1–2 باقيين"], ["h", "للفشل", "ولا عدّة"]].map(([k, t, sub]) =>
           `<button type="button" data-rir="${k}" aria-pressed="${d.rir === k}"><b>${t}</b><small>${sub}</small></button>`).join("")}</div></div>
@@ -1296,6 +1310,16 @@ function renderSettings() {
   const gopts = [2, 3, 4, 5, 6].map(g => `<option value="${g}"${db.goal === g ? " selected" : ""}>${g} أيام بالأسبوع</option>`).join("");
   return `<div class="stack enter">
     <h1>الإعدادات</h1>
+    <div class="card stack">
+      <div class="spread"><div><div class="eyebrow">المعدّات</div><h3>وين بتتمرن؟</h3></div>
+        <div class="seg" role="group" aria-label="المعدّات">
+          <button type="button" data-equip="gym" aria-pressed="${!isGM()}">جيم</button>
+          <button type="button" data-equip="gm" aria-pressed="${isGM()}">Gym Monster</button>
+        </div></div>
+      <small class="muted">${isGM()
+        ? "وضع Gym Monster: بتطلعلك بس التمارين اللي بتنعمل على الجهاز (كيبل، بار، مقابض، حبل، حزام كاحل، بنش). الوزن بيزيد بخطوات نص كيلو، وحاسبة الأقراص مخفية. سجّل الوزن الكلي اللي بتختاره بالجهاز."
+        : "وضع الجيم: كل التمارين والأجهزة، وزيادات الوزن حسب أوزان الجيم (2.5 كغ للبار والأجهزة)."}</small>
+    </div>
     <div class="card stack">
       <div class="field"><label class="eyebrow" for="goal-sel">هدف التمرين الأسبوعي</label><select class="input" id="goal-sel">${gopts}</select></div>
       <div class="field"><label class="eyebrow" for="rest-sel">مدة الراحة بين المجموعات</label><select class="input" id="rest-sel">${opts}</select></div>
@@ -1429,7 +1453,7 @@ function deleteSet(id) {
   const [removed] = db.sets.splice(i, 1); save(); refresh();
   toast("انحذفت المجموعة", () => { db.sets.push(removed); save(); refresh(); });
 }
-const exportJSON = () => JSON.stringify({ app: "gym-log", version: 1, exported: new Date().toISOString(), custom: db.custom, sets: db.sets, rest: db.rest, goal: db.goal, ranges: db.ranges, recovery: db.recovery });
+const exportJSON = () => JSON.stringify({ app: "gym-log", version: 1, exported: new Date().toISOString(), custom: db.custom, sets: db.sets, rest: db.rest, goal: db.goal, ranges: db.ranges, recovery: db.recovery, equip: db.equip });
 function importJSON(text) {
   try {
     const data = JSON.parse(text);
@@ -1440,6 +1464,7 @@ function importJSON(text) {
     if (data.goal) db.goal = +data.goal;
     db.ranges = data.ranges && typeof data.ranges === "object" ? data.ranges : {};
     db.recovery = data.recovery && typeof data.recovery === "object" ? data.recovery : {};
+    if (data.equip) db.equip = data.equip;
     save(); refresh();
     toast(`تم الاسترجاع: <span class="num">${db.sets.length}</span> مجموعة`);
   } catch (e) { toast("البيانات مش صالحة. تأكد إنك نسخت النص كامل."); }
@@ -1455,7 +1480,7 @@ const confirmActions = {
 };
 
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-range],[data-rir],[data-go],[data-side],[data-m],[data-muscle],[data-ex],[data-back],[data-step],[data-del],[data-confirm],[data-metric],[data-cal],[data-jump],#log-set,#export-copy,#export-file,#import-go,#whoop-connect,#whoop-sync,#whoop-off");
+  const t = e.target.closest("[data-equip],[data-range],[data-rir],[data-go],[data-side],[data-m],[data-muscle],[data-ex],[data-back],[data-step],[data-del],[data-confirm],[data-metric],[data-cal],[data-jump],#log-set,#export-copy,#export-file,#import-go,#whoop-connect,#whoop-sync,#whoop-off");
   if (!t) return;
   if (t.dataset.go) return go(t.dataset.go);
   if (t.dataset.side) { ui.side = t.dataset.side; return refresh(); }
@@ -1472,6 +1497,11 @@ document.addEventListener("click", e => {
     d[k] = k === "w" ? Math.max(0, Math.round((d.w + +v) * 100) / 100) : Math.max(1, d.r + +v);
     document.getElementById(k === "w" ? "w-input" : "r-input").value = k === "w" ? fmtW(d.w) : d.r;
     if (k === "w") { const p = document.getElementById("plates"); if (p) p.innerHTML = platesHTML(d.w); }
+    return;
+  }
+  if (t.dataset.equip) {
+    db.equip = t.dataset.equip; save(); ui.drafts = {}; refresh();
+    toast(isGM() ? "تفعّل وضع Gym Monster" : "رجعت لوضع الجيم");
     return;
   }
   if (t.dataset.range) {
