@@ -326,6 +326,17 @@ textarea.input { min-height: 110px; direction: ltr; font-family: ui-monospace, m
 
 .whoop-auto { font-size: .78rem; color: var(--fg-2); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
+.warnline { margin: 0; font-size: .82rem; color: var(--recover); background: rgb(246 178 60 / .1); border: 1px solid rgb(246 178 60 / .25); border-radius: var(--r-sm); padding: 8px 10px; line-height: 1.6; }
+.whoop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.wg { background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--r-sm); padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.wg b { font-family: var(--font-num); font-size: 1.6rem; line-height: 1.1; font-weight: 700; }
+.wg small { font-size: .72rem; color: var(--muted); }
+.wg .bar { display: block; height: 5px; border-radius: 3px; background: var(--surface-3); overflow: hidden; margin-block: 3px; }
+.wg .bar i { display: block; height: 100%; background: linear-gradient(90deg, #7b6cff, var(--accent-2)); border-radius: 3px; }
+.wk { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: .8rem; color: var(--fg-2); background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--r-sm); padding: 8px 10px; }
+.wk b { font-size: 1rem; color: var(--fg); }
+.wk-tag { font-size: .66rem; font-weight: 700; letter-spacing: .08em; background: var(--fg); color: var(--bg); border-radius: 5px; padding: 1px 6px; }
+
 /* ---------- exercise photos ---------- */
 .thumb { width: 64px; height: 48px; border-radius: 12px; object-fit: cover; flex: none; background: var(--surface-3); border: 1px solid var(--line); }
 .photo { position: relative; padding: 0; overflow: hidden; aspect-ratio: 3 / 2; max-width: 100%; background: var(--surface-3); }
@@ -666,6 +677,8 @@ function coach(ex) {
   }
   if (zone === "green" && (action === "reps" || action === "confirm")) why += " تعافيك أخضر اليوم، يوم ممتاز تضغط فيه.";
   if (zone === "yellow" && action === "up") why += " تعافيك أصفر: إذا حسيت الوزن تقيل، ارجع للوزن القديم.";
+  const sl = typeof whoopToday === "function" ? whoopToday("sleep") : null;
+  if (sl && sl.asleep < 360 && (action === "up" || action === "confirm")) why += ` نمت ${hm(sl.asleep)} بس (أقل من 6 ساعات)، فالقوة ممكن تكون أقل اليوم: إذا الوزن تقيل، ثبّت عليه.`;
   return { last, w, r, why, action, rule, lo, hi, status: statusOf(past), pct: trendOf(past), rec, zone };
 }
 // Kept for callers that only need the next target.
@@ -766,40 +779,91 @@ async function syncWhoop(force) {
   if ((!w.connected && !w.pending) || !whoopBase()) return;
   if (!force && w.fetched && Date.now() - w.fetched < 30 * 60000) return;
   try {
-    const r = await fetch(`${whoopBase()}/recovery?key=${whoopKey()}`);
-    const d = await r.json();
+    let r = await fetch(`${whoopBase()}/today?key=${whoopKey()}`);
+    let d;
+    if (r.status === 404) { // worker still on the first version: recovery only
+      const o = await (await fetch(`${whoopBase()}/recovery?key=${whoopKey()}`)).json();
+      d = { connected: o.connected, missing: ["sleep", "workout", "worker"], recovery: o.connected ? o : null };
+    } else d = await r.json();
     w.fetched = Date.now();
     if (d.connected === false) {
       if (w.pending) return; // still waiting for the user to finish the WHOOP consent
       w.connected = false; save(); toast("انقطع الربط مع WHOOP. اربطه من جديد من الإعدادات."); return refresh();
     }
     if (d.connected && !w.connected) { w.connected = true; w.pending = false; toast("انربط WHOOP ✅"); }
-    w.state = d.state || null;
-    if (d.state === "SCORED" && d.date && dayKey(Date.parse(d.date)) === todayKey() && typeof d.score === "number") {
-      (db.recovery ||= {})[todayKey()] = Math.round(d.score);
-      w.hrv = d.hrv; w.rhr = d.rhr; w.day = todayKey();
+    w.missing = d.missing || [];
+    const rec = d.recovery;
+    w.state = rec ? rec.state : null;
+    if (rec && rec.state === "SCORED" && rec.date && dayKey(Date.parse(rec.date)) === todayKey() && typeof rec.score === "number") {
+      (db.recovery ||= {})[todayKey()] = Math.round(rec.score);
+      w.hrv = rec.hrv; w.rhr = rec.rhr; w.day = todayKey();
     }
+    // Last night's sleep counts for the day it ended on.
+    if (d.sleep && d.sleep.state === "SCORED" && dayKey(Date.parse(d.sleep.end)) === todayKey()) w.sleep = { ...d.sleep, day: todayKey() };
+    if (d.cycle && typeof d.cycle.strain === "number" && (!d.cycle.end || dayKey(Date.parse(d.cycle.start)) === todayKey()))
+      w.strain = { value: d.cycle.strain, day: todayKey() };
+    const store = (db.whoopWorkouts ||= {});
+    for (const x of d.workouts || []) store[x.id] = x;
+    const cutoff = Date.now() - 120 * 86400000;
+    for (const [id, x] of Object.entries(store)) if (Date.parse(x.start) < cutoff) delete store[id];
     save();
-    if (["home", "exercise", "settings"].includes(ui.view)) refresh();
+    if (["home", "exercise", "settings", "history"].includes(ui.view)) refresh();
   } catch (e) { /* offline or server unreachable: keep manual entry */ }
+}
+const whoopToday = k => { const v = whoop()[k]; return v && v.day === todayKey() ? v : null; };
+const hm = min => `${Math.floor(min / 60)}:${pad(min % 60)}`;
+// The WHOOP workout that overlaps a gym session (±45 min), else that day's strength-type workout.
+function whoopWorkoutFor(day, sets) {
+  const ws = Object.values(db.whoopWorkouts || {}).filter(x => dayKey(Date.parse(x.start)) === day);
+  if (!ws.length) return null;
+  if (sets && sets.length) {
+    const a = sets[0].t - 45 * 60000, b = sets[sets.length - 1].t + 45 * 60000;
+    const ov = ws.filter(x => Date.parse(x.start) <= b && Date.parse(x.end) >= a);
+    if (ov.length) return ov.sort((p, q) => q.strain - p.strain)[0];
+  }
+  return ws.find(x => /weight|strength|functional|power|lift|bodybuild/i.test(x.sport)) || null;
+}
+function whoopWorkoutHTML(x) {
+  if (!x) return "";
+  const mins = Math.round((Date.parse(x.end) - Date.parse(x.start)) / 60000);
+  return `<div class="wk"><span class="wk-tag">WHOOP</span>
+    <span>Strain <b class="num">${x.strain.toFixed(1)}</b></span>
+    ${x.kcal != null ? `<span><b class="num">${x.kcal}</b> سعرة</span>` : ""}
+    ${x.avgHr ? `<span>معدل النبض <b class="num">${x.avgHr}</b></span><span>أعلى نبض <b class="num">${x.maxHr}</b></span>` : ""}
+    <span><b class="num">${mins}</b> دقيقة</span></div>`;
 }
 function whoopSettingsHTML() {
   const w = whoop();
   return `<div class="card stack">
       <div class="spread"><div><div class="eyebrow">الأجهزة</div><h3>WHOOP</h3></div>
         <span class="chip ${w.connected ? "ready" : ""}">${w.connected ? "مربوط" : "مش مربوط"}</span></div>
+      ${w.connected && (w.missing || []).includes("worker") ? `<p class="warnline">السيرفر على النسخة القديمة. حدّث كود الـ Worker على Cloudflare، وبعدها اضغط «أعد الربط» لتفعيل النوم والتمارين.</p>`
+        : w.connected && (w.missing || []).length ? `<p class="warnline">النوم والتمارين لسا مش مفعّلين. اضغط «أعد الربط» ووافق على الصلاحيات الجديدة.</p>` : ""}
       <small class="muted">${w.connected
         ? "نسبة التعافي بتنعبّى لحالها كل ما تفتح التطبيق، بعد ما WHOOP يحسبها الصبح."
         : w.pending ? "إذا وافقت على صفحة WHOOP، اضغط «تحقق من الربط»." : "اكتب رابط السيرفر تبعك على Cloudflare، واضغط «اربط». الشرح الكامل بملف whoop-worker/README.md."}</small>
       <div class="field"><label class="eyebrow" for="whoop-url">رابط السيرفر (Cloudflare Worker)</label>
         <input class="input" id="whoop-url" dir="ltr" inputmode="url" placeholder="https://gym-whoop.xxxx.workers.dev" value="${esc(w.url || "")}"></div>
       <div class="row">${w.connected
-        ? `<button class="btn" type="button" id="whoop-sync">حدّث الآن</button><button class="btn danger" type="button" id="whoop-off">افصل WHOOP</button>`
+        ? `${(w.missing || []).length ? `<button class="btn" type="button" id="whoop-connect" style="background:var(--accent);border-color:var(--accent);color:#fff">أعد الربط</button>` : ""}<button class="btn" type="button" id="whoop-sync">حدّث الآن</button><button class="btn danger" type="button" id="whoop-off">افصل WHOOP</button>`
         : `<button class="btn" type="button" id="whoop-connect" style="background:var(--accent);border-color:var(--accent);color:#fff">اربط WHOOP</button>${w.pending ? `<button class="btn" type="button" id="whoop-sync">تحقق من الربط</button>` : ""}`}</div>
       <small class="muted">بدون ربط، بتقدر تكتب نسبة التعافي بإيدك من الصفحة الرئيسية. أحمر (أقل من 34%) بيوقّف اقتراح كسر الوزن، وأخضر (67% وفوق) بيشجعك تضغط.</small>
     </div>`;
 }
 
+function sleepStrainHTML() {
+  const sl = whoopToday("sleep"), st = whoopToday("strain");
+  const today = whoopWorkoutFor(todayKey(), db.sets.filter(x => dayKey(x.t) === todayKey()).sort((a, b) => a.t - b.t));
+  if (!sl && !st && !today) return "";
+  const pct = sl && sl.need ? Math.min(100, Math.round(sl.asleep / sl.need * 100)) : null;
+  return `<div class="whoop-grid">
+    ${sl ? `<div class="wg"><span class="eyebrow">النوم</span><b class="num">${hm(sl.asleep)}</b>
+      <small>${sl.need ? `من <span class="num">${hm(sl.need)}</span> مطلوبة` : ""}${sl.performance != null ? ` · أداء <span class="num">${Math.round(sl.performance)}%</span>` : ""}</small>
+      ${pct != null ? `<i class="bar"><i style="width:${pct}%"></i></i>` : ""}
+      <small>عميق <span class="num">${hm(sl.deep)}</span> · REM <span class="num">${hm(sl.rem)}</span></small></div>` : ""}
+    ${st ? `<div class="wg"><span class="eyebrow">Strain اليوم</span><b class="num">${st.value.toFixed(1)}</b><small>من <span class="num">21</span></small></div>` : ""}
+  </div>${whoopWorkoutHTML(today)}`;
+}
 function recoveryCardHTML() {
   const v = recoveryToday(), z = recZone(v);
   const T = {
@@ -814,6 +878,7 @@ function recoveryCardHTML() {
     ${whoop().connected ? `<p class="whoop-auto"><span class="dot ready"></span>${whoop().day === todayKey()
       ? `من WHOOP تلقائياً${whoop().hrv != null ? ` · HRV <span class="num">${whoop().hrv}</span> ms` : ""}${whoop().rhr != null ? ` · نبض الراحة <span class="num">${whoop().rhr}</span>` : ""}`
       : whoop().state === "PENDING_SCORE" ? "WHOOP لسا عم يحسب تعافي اليوم" : "مربوط مع WHOOP، بانتظار تعافي اليوم"}</p>` : ""}
+    ${sleepStrainHTML()}
     <div class="row" style="flex-wrap:nowrap"><label class="sr" for="rec-input">نسبة التعافي</label>
       <input class="input" id="rec-input" type="number" inputmode="numeric" min="0" max="100" placeholder="مثلاً 72" value="${v ?? ""}">
       <button class="btn" type="submit" style="flex:none">${v == null ? "حفظ" : "تعديل"}</button></div>
@@ -1217,6 +1282,7 @@ function renderHistory() {
     return `<div class="card day-card stack" id="d${k}" style="gap:12px">
       <div class="head"><div><h3>${fmtDate(k)}</h3><small class="muted">${daysAgo(k)}</small></div>
         <div class="chips row" style="gap:4px;justify-content:flex-end">${[...muscles].map(m => `<span class="chip">${MUSCLES[m].name}</span>`).join("")}</div></div>
+      ${whoopWorkoutHTML(whoopWorkoutFor(k, sets))}
       <div class="meta"><span><b class="num">${sets.length}</b> مجموعة</span><span><b class="num">${vol.toLocaleString("en")}</b> كغ</span>${mins > 1 ? `<span><b class="num">${mins}</b> دقيقة</span>` : ""}</div>
       <div>${lines}</div>
     </div>`;
@@ -1434,7 +1500,7 @@ document.addEventListener("click", e => {
   if (t.id === "whoop-off") {
     const w = whoop();
     fetch(`${whoopBase()}/disconnect?key=${whoopKey()}`, { method: "POST" }).catch(() => {});
-    w.connected = false; delete w.hrv; delete w.rhr; delete w.day; save(); refresh(); toast("انفصل WHOOP");
+    w.connected = false; ["hrv", "rhr", "day", "sleep", "strain", "missing"].forEach(k => delete w[k]); save(); refresh(); toast("انفصل WHOOP");
     return;
   }
   if (t.id === "log-set") return logSet();
