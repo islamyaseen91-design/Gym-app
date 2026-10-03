@@ -506,6 +506,7 @@ const PRESETS = {
   calves:      [["سمانة واقف", "machine"], ["سمانة جالس", "machine"], ["سمانة على الليج برس", "machine"]],
 };
 
+const APP_VERSION = "2026.10.04-2";
 const STORE_KEY = "gymlog.v1";
 const DEFAULTS = () => ({ custom: [], sets: [], rest: 90, goal: 4, ranges: {}, recovery: {} });
 let db = DEFAULTS();
@@ -1316,7 +1317,7 @@ function renderSettings() {
       <small class="muted">بيمسح كل الأوزان والتمارين الخاصة فيك من هالجهاز. ما في رجعة.</small>
       <button class="btn danger" type="button" data-confirm="reset">مسح كل البيانات</button>
     </div>
-    <small class="muted" style="text-align:center"><span class="num">${db.sets.length}</span> مجموعة مسجلة · دفتر الجيم</small>
+    <small class="muted" style="text-align:center"><span class="num">${db.sets.length}</span> مجموعة مسجلة · دفتر الجيم · الإصدار <span class="num">${APP_VERSION}</span></small>
   </div>`;
 }
 
@@ -1583,7 +1584,15 @@ render();
 syncWhoop(true);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") syncWhoop(false); });
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-  navigator.serviceWorker.register("sw.js").catch(() => {});
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  // A new version took over: reload once so the screen shows it (not on the very first install).
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (hadController && !reloaded) { reloaded = true; location.reload(); }
+  });
+  navigator.serviceWorker.register("sw.js").then(reg => {
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") reg.update().catch(() => {}); });
+  }).catch(() => {});
 }
 </script>
 </body>
