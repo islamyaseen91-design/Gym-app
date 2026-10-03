@@ -324,6 +324,8 @@ textarea.input { min-height: 110px; direction: ltr; font-family: ui-monospace, m
 .recbadge.red { background: rgb(255 90 78 / .15); color: var(--fresh); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+.whoop-auto { font-size: .78rem; color: var(--fg-2); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
 /* ---------- exercise photos ---------- */
 .thumb { width: 64px; height: 48px; border-radius: 12px; object-fit: cover; flex: none; background: var(--surface-3); border: 1px solid var(--line); }
 .photo { position: relative; padding: 0; overflow: hidden; aspect-ratio: 3 / 2; max-width: 100%; background: var(--surface-3); }
@@ -748,6 +750,52 @@ function weekInfo() {
 const fmtVol = v => v >= 10000 ? (v / 1000).toFixed(1) + "k" : v.toLocaleString("en");
 function greeting() { const h = new Date().getHours(); return h < 12 ? "صباح الخير" : h < 18 ? "يعطيك العافية" : "مساء الخير"; }
 
+/* ---------- WHOOP (via the user's Cloudflare Worker, see whoop-worker/) ---------- */
+const whoop = () => (db.whoop ||= {});
+function whoopKey() {
+  const w = whoop();
+  if (!w.key) {
+    const a = new Uint8Array(32); crypto.getRandomValues(a);
+    w.key = [...a].map(b => b.toString(16).padStart(2, "0")).join(""); save();
+  }
+  return w.key;
+}
+const whoopBase = () => (whoop().url || "").trim().replace(/\/+$/, "");
+async function syncWhoop(force) {
+  const w = whoop();
+  if (!w.connected || !whoopBase()) return;
+  if (!force && w.fetched && Date.now() - w.fetched < 30 * 60000) return;
+  try {
+    const r = await fetch(`${whoopBase()}/recovery?key=${whoopKey()}`);
+    const d = await r.json();
+    w.fetched = Date.now();
+    if (d.connected === false) { w.connected = false; save(); toast("انقطع الربط مع WHOOP. اربطه من جديد من الإعدادات."); return refresh(); }
+    w.state = d.state || null;
+    if (d.state === "SCORED" && d.date && dayKey(Date.parse(d.date)) === todayKey() && typeof d.score === "number") {
+      (db.recovery ||= {})[todayKey()] = Math.round(d.score);
+      w.hrv = d.hrv; w.rhr = d.rhr; w.day = todayKey();
+    }
+    save();
+    if (["home", "exercise", "settings"].includes(ui.view)) refresh();
+  } catch (e) { /* offline or server unreachable: keep manual entry */ }
+}
+function whoopSettingsHTML() {
+  const w = whoop();
+  return `<div class="card stack">
+      <div class="spread"><div><div class="eyebrow">الأجهزة</div><h3>WHOOP</h3></div>
+        <span class="chip ${w.connected ? "ready" : ""}">${w.connected ? "مربوط" : "مش مربوط"}</span></div>
+      <small class="muted">${w.connected
+        ? "نسبة التعافي بتنعبّى لحالها كل ما تفتح التطبيق، بعد ما WHOOP يحسبها الصبح."
+        : "اكتب رابط السيرفر تبعك على Cloudflare، واضغط «اربط». الشرح الكامل بملف whoop-worker/README.md."}</small>
+      <div class="field"><label class="eyebrow" for="whoop-url">رابط السيرفر (Cloudflare Worker)</label>
+        <input class="input" id="whoop-url" dir="ltr" inputmode="url" placeholder="https://gym-whoop.xxxx.workers.dev" value="${esc(w.url || "")}"></div>
+      <div class="row">${w.connected
+        ? `<button class="btn" type="button" id="whoop-sync">حدّث الآن</button><button class="btn danger" type="button" id="whoop-off">افصل WHOOP</button>`
+        : `<button class="btn" type="button" id="whoop-connect" style="background:var(--accent);border-color:var(--accent);color:#fff">اربط WHOOP</button>`}</div>
+      <small class="muted">بدون ربط، بتقدر تكتب نسبة التعافي بإيدك من الصفحة الرئيسية. أحمر (أقل من 34%) بيوقّف اقتراح كسر الوزن، وأخضر (67% وفوق) بيشجعك تضغط.</small>
+    </div>`;
+}
+
 function recoveryCardHTML() {
   const v = recoveryToday(), z = recZone(v);
   const T = {
@@ -759,6 +807,9 @@ function recoveryCardHTML() {
     <div class="spread"><div><div class="eyebrow">WHOOP · تعافي اليوم</div><h2>${z ? T[z][0] : "قديش تعافيك اليوم؟"}</h2></div>
       ${z ? `<span class="recbadge ${z}"><span class="num">${v}%</span></span>` : ""}</div>
     <p class="muted" style="font-size:.85rem">${z ? T[z][1] : "اكتب نسبة التعافي من تطبيق WHOOP، والمدرب بيعدّل اقتراحاته حسبها."}</p>
+    ${whoop().connected ? `<p class="whoop-auto"><span class="dot ready"></span>${whoop().day === todayKey()
+      ? `من WHOOP تلقائياً${whoop().hrv != null ? ` · HRV <span class="num">${whoop().hrv}</span> ms` : ""}${whoop().rhr != null ? ` · نبض الراحة <span class="num">${whoop().rhr}</span>` : ""}`
+      : whoop().state === "PENDING_SCORE" ? "WHOOP لسا عم يحسب تعافي اليوم" : "مربوط مع WHOOP، بانتظار تعافي اليوم"}</p>` : ""}
     <div class="row" style="flex-wrap:nowrap"><label class="sr" for="rec-input">نسبة التعافي</label>
       <input class="input" id="rec-input" type="number" inputmode="numeric" min="0" max="100" placeholder="مثلاً 72" value="${v ?? ""}">
       <button class="btn" type="submit" style="flex:none">${v == null ? "حفظ" : "تعديل"}</button></div>
@@ -1179,11 +1230,7 @@ function renderSettings() {
       <div class="field"><label class="eyebrow" for="rest-sel">مدة الراحة بين المجموعات</label><select class="input" id="rest-sel">${opts}</select></div>
       <small class="muted">مؤقت الراحة بيشتغل لحاله بعد كل مجموعة.</small>
     </div>
-    <div class="card stack">
-      <div><div class="eyebrow">الأجهزة</div><h3>WHOOP</h3></div>
-      <small class="muted">هلأ بتدخل نسبة التعافي بإيدك من الصفحة الرئيسية، والمدرب بيستعملها: أحمر (أقل من 34%) بيوقّف اقتراح كسر الوزن، وأخضر (67% وفوق) بيشجعك تضغط.</small>
-      <small class="muted">الربط التلقائي مع WHOOP بيحتاج تسجيل تطبيق مطوّر عند WHOOP وسيرفر صغير يحفظ المفتاح السري، وهاد ممكن نضيفه لاحقاً.</small>
-    </div>
+    ${whoopSettingsHTML()}
     <div class="card stack">
       <div><div class="eyebrow">بياناتك</div><h3>نسخة احتياطية</h3></div>
       <small class="muted">بياناتك محفوظة على هالجهاز بس. انسخها واحفظها عندك، أو انقلها لجهاز ثاني.</small>
@@ -1337,7 +1384,7 @@ const confirmActions = {
 };
 
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-range],[data-rir],[data-go],[data-side],[data-m],[data-muscle],[data-ex],[data-back],[data-step],[data-del],[data-confirm],[data-metric],[data-cal],[data-jump],#log-set,#export-copy,#export-file,#import-go");
+  const t = e.target.closest("[data-range],[data-rir],[data-go],[data-side],[data-m],[data-muscle],[data-ex],[data-back],[data-step],[data-del],[data-confirm],[data-metric],[data-cal],[data-jump],#log-set,#export-copy,#export-file,#import-go,#whoop-connect,#whoop-sync,#whoop-off");
   if (!t) return;
   if (t.dataset.go) return go(t.dataset.go);
   if (t.dataset.side) { ui.side = t.dataset.side; return refresh(); }
@@ -1371,6 +1418,20 @@ document.addEventListener("click", e => {
       return;
     }
     return confirmActions[t.dataset.confirm]();
+  }
+  if (t.id === "whoop-connect") {
+    const u = document.getElementById("whoop-url").value.trim().replace(/\/+$/, "");
+    if (!/^https:\/\/[^\s/]+$/.test(u)) return toast("اكتب رابط السيرفر كامل، بيبلّش بـ https://");
+    whoop().url = u; save();
+    location.href = `${u}/login?key=${whoopKey()}&return=${encodeURIComponent(location.origin + location.pathname)}`;
+    return;
+  }
+  if (t.id === "whoop-sync") { toast("عم حدّث من WHOOP…"); return syncWhoop(true); }
+  if (t.id === "whoop-off") {
+    const w = whoop();
+    fetch(`${whoopBase()}/disconnect?key=${whoopKey()}`, { method: "POST" }).catch(() => {});
+    w.connected = false; delete w.hrv; delete w.rhr; delete w.day; save(); refresh(); toast("انفصل WHOOP");
+    return;
   }
   if (t.id === "log-set") return logSet();
   if (t.id === "export-copy") {
@@ -1441,7 +1502,16 @@ document.addEventListener("submit", e => {
 /* ---------- boot ---------- */
 load();
 try { history.replaceState({ view: "home" }, ""); } catch (e) {}
+if (location.hash === "#whoop-ok" || location.hash === "#whoop-denied") {
+  const ok = location.hash === "#whoop-ok";
+  if (ok) whoop().connected = true;
+  save();
+  try { history.replaceState({ view: "home" }, "", location.pathname); } catch (e) {}
+  setTimeout(() => toast(ok ? "انربط WHOOP ✅" : "ما تم الربط مع WHOOP"), 300);
+}
 render();
+syncWhoop(true);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") syncWhoop(false); });
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }

@@ -1,5 +1,5 @@
 // Offline cache: app shell is cache-first, fonts are cached as they load.
-const CACHE = "gym-log-v5";
+const CACHE = "gym-log-v6";
 const SHELL = ["./", "index.html", "guides.js", "manifest.json", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -10,6 +10,9 @@ self.addEventListener("activate", e => {
 });
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
+  // Leave cross-origin API calls (e.g. the WHOOP worker) to the network; only the app shell and fonts are cached.
+  const u = new URL(e.request.url);
+  if (u.origin !== self.location.origin && !u.hostname.startsWith("fonts.g")) return;
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
       if (res.ok && (e.request.url.startsWith(self.location.origin) || e.request.url.includes("fonts.g"))) {
