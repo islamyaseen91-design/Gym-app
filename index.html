@@ -288,6 +288,25 @@ textarea.input { min-height: 110px; direction: ltr; font-family: ui-monospace, m
 .empty svg { width: 48px; height: 48px; color: var(--surface-3); }
 .empty b { color: var(--fg); font-family: var(--font-display); font-size: 1.05rem; }
 
+/* ---------- exercise photos ---------- */
+.thumb { width: 64px; height: 48px; border-radius: 12px; object-fit: cover; flex: none; background: var(--surface-3); border: 1px solid var(--line); }
+.photo { position: relative; padding: 0; overflow: hidden; aspect-ratio: 3 / 2; max-width: 100%; background: var(--surface-3); }
+.photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.photo .f1 { animation: frame 2.4s steps(1, end) infinite; }
+@keyframes frame { 0% { opacity: 0; } 50% { opacity: 1; } }
+.photo .tag { position: absolute; inset-block-end: 10px; inset-inline-start: 10px; display: flex; gap: 6px; }
+.photo .tag span { font-size: .72rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: rgb(11 13 17 / .72); color: #fff; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.photo .tag .s1 { animation: frame 2.4s steps(1, end) infinite; }
+.photo .tag .s0 { animation: frame 2.4s steps(1, end) infinite reverse; }
+.photo .credit { position: absolute; inset-block-start: 8px; inset-inline-end: 10px; font-size: .62rem; color: rgb(255 255 255 / .75); text-shadow: 0 1px 2px rgb(0 0 0 / .8); direction: ltr; }
+@media (prefers-reduced-motion: reduce) {
+  .photo { aspect-ratio: 3 / 1; }
+  .photo img { width: 50%; }
+  .photo .f0 { inset-inline-start: auto; inset-inline-end: 0; }
+  .photo .f1 { animation: none; opacity: 1; inset-inline-end: auto; inset-inline-start: 0; }
+  .photo .tag { display: none; }
+}
+
 /* ---------- technique guide ---------- */
 .guide { padding: 0; overflow: hidden; }
 .guide summary { list-style: none; display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; }
@@ -417,25 +436,25 @@ const MUSCLES = {
 const TYPES = { barbell: "بار", dumbbell: "دمبل", machine: "جهاز", cable: "كيبل", bodyweight: "وزن الجسم" };
 
 const PRESETS = {
-  chest_upper: [["بنش مائل بار", "barbell"], ["بنش مائل دمبل", "dumbbell"], ["تفتيح مائل دمبل", "dumbbell"], ["كيبل كروس من تحت لفوق", "cable"]],
-  chest_mid:   [["بنش مستوي بار", "barbell"], ["بنش مستوي دمبل", "dumbbell"], ["جهاز ضغط صدر", "machine"], ["بيك ديك (فراشة)", "machine"]],
-  chest_lower: [["بنش مقلوب بار", "barbell"], ["متوازي (ديبس)", "bodyweight"], ["كيبل كروس من فوق لتحت", "cable"]],
-  delt_front:  [["ضغط أكتاف بار", "barbell"], ["ضغط أكتاف دمبل", "dumbbell"], ["رفرفة أمامي دمبل", "dumbbell"]],
-  delt_side:   [["رفرفة جانبي دمبل", "dumbbell"], ["رفرفة جانبي كيبل", "cable"], ["جهاز رفرفة جانبي", "machine"]],
-  delt_rear:   [["رفرفة خلفي دمبل", "dumbbell"], ["جهاز فراشة عكسي", "machine"], ["فيس بول", "cable"]],
-  biceps:      [["بايسبس بار", "barbell"], ["بايسبس دمبل", "dumbbell"], ["هامر", "dumbbell"], ["بايسبس كيبل", "cable"]],
-  triceps:     [["تراي كيبل حبل", "cable"], ["فرنش برس", "barbell"], ["تراي فوق الراس دمبل", "dumbbell"], ["بنش ضيق", "barbell"]],
+  chest_upper: [["بنش مائل بار", "barbell"], ["بنش مائل دمبل", "dumbbell"], ["تفتيح مائل دمبل", "dumbbell"], ["كيبل كروس من تحت لفوق", "cable"], ["بنش مائل سميث", "machine"], ["جهاز ضغط صدر مائل", "machine"]],
+  chest_mid:   [["بنش مستوي بار", "barbell"], ["بنش مستوي دمبل", "dumbbell"], ["جهاز ضغط صدر", "machine"], ["بيك ديك (فراشة)", "machine"], ["ضغط (بوش أب)", "bodyweight"], ["تفتيح مستوي دمبل", "dumbbell"]],
+  chest_lower: [["بنش مقلوب بار", "barbell"], ["متوازي (ديبس)", "bodyweight"], ["كيبل كروس من فوق لتحت", "cable"], ["بنش مقلوب دمبل", "dumbbell"]],
+  delt_front:  [["ضغط أكتاف بار", "barbell"], ["ضغط أكتاف دمبل", "dumbbell"], ["رفرفة أمامي دمبل", "dumbbell"], ["أرنولد برس", "dumbbell"], ["جهاز ضغط أكتاف", "machine"]],
+  delt_side:   [["رفرفة جانبي دمبل", "dumbbell"], ["رفرفة جانبي كيبل", "cable"], ["جهاز رفرفة جانبي", "machine"], ["سحب عمودي بار (أبرايت رو)", "barbell"]],
+  delt_rear:   [["رفرفة خلفي دمبل", "dumbbell"], ["جهاز فراشة عكسي", "machine"], ["فيس بول", "cable"], ["رفرفة خلفي كيبل", "cable"]],
+  biceps:      [["بايسبس بار", "barbell"], ["بايسبس دمبل", "dumbbell"], ["هامر", "dumbbell"], ["بايسبس كيبل", "cable"], ["بايسبس ارتكاز (بريتشر)", "barbell"], ["بايسبس دمبل على بنش مائل", "dumbbell"], ["بايسبس تركيز", "dumbbell"]],
+  triceps:     [["تراي كيبل حبل", "cable"], ["فرنش برس", "barbell"], ["تراي فوق الراس دمبل", "dumbbell"], ["بنش ضيق", "barbell"], ["تراي كيبل بار", "cable"], ["متوازي تراي", "bodyweight"], ["كيك باك دمبل", "dumbbell"], ["تراي كيبل فوق الراس", "cable"]],
   forearms:    [["رسغ بار", "barbell"], ["رسغ عكسي", "barbell"]],
-  abs:         [["كرنش", "bodyweight"], ["رفع رجلين معلّق", "bodyweight"], ["كرنش كيبل", "cable"]],
-  obliques:    [["روسيان تويست", "bodyweight"], ["ميلان جانبي دمبل", "dumbbell"]],
+  abs:         [["كرنش", "bodyweight"], ["رفع رجلين معلّق", "bodyweight"], ["كرنش كيبل", "cable"], ["بلانك (بالثواني)", "bodyweight"], ["عجلة البطن", "bodyweight"], ["كرنش عكسي", "bodyweight"]],
+  obliques:    [["روسيان تويست", "bodyweight"], ["ميلان جانبي دمبل", "dumbbell"], ["وود تشوب كيبل", "cable"], ["كرنش دراجة", "bodyweight"]],
   traps:       [["شرغ بار", "barbell"], ["شرغ دمبل", "dumbbell"]],
-  upper_back:  [["تجديف بار", "barbell"], ["تجديف دمبل", "dumbbell"], ["تجديف كيبل جالس", "cable"]],
-  lats:        [["سحب أمامي", "cable"], ["عقلة", "bodyweight"], ["بول أوفر كيبل", "cable"]],
-  lower_back:  [["ديدليفت", "barbell"], ["ظهر سفلي (هايبر)", "bodyweight"]],
-  glutes:      [["هيب ثرست بار", "barbell"], ["بلغاري سكوات", "dumbbell"], ["جهاز أبداكتور", "machine"]],
-  quads:       [["سكوات بار", "barbell"], ["ليج برس", "machine"], ["ليج إكستنشن", "machine"], ["هاك سكوات", "machine"], ["لانجز دمبل", "dumbbell"]],
-  hamstrings:  [["ليج كيرل", "machine"], ["رومانيان ديدليفت", "barbell"]],
-  calves:      [["سمانة واقف", "machine"], ["سمانة جالس", "machine"]],
+  upper_back:  [["تجديف بار", "barbell"], ["تجديف دمبل", "dumbbell"], ["تجديف كيبل جالس", "cable"], ["تجديف T-بار", "machine"], ["تجديف جهاز", "machine"], ["تجديف دمبل على بنش مائل", "dumbbell"]],
+  lats:        [["سحب أمامي", "cable"], ["عقلة", "bodyweight"], ["بول أوفر كيبل", "cable"], ["عقلة قبضة عكسية (تشن أب)", "bodyweight"], ["سحب أمامي قبضة ضيقة", "cable"]],
+  lower_back:  [["ديدليفت", "barbell"], ["ظهر سفلي (هايبر)", "bodyweight"], ["جود مورنينج", "barbell"]],
+  glutes:      [["هيب ثرست بار", "barbell"], ["بلغاري سكوات", "dumbbell"], ["جهاز أبداكتور", "machine"], ["كيك باك كيبل", "cable"], ["جسر المؤخرة بار", "barbell"], ["سومو ديدليفت", "barbell"]],
+  quads:       [["سكوات بار", "barbell"], ["ليج برس", "machine"], ["ليج إكستنشن", "machine"], ["هاك سكوات", "machine"], ["لانجز دمبل", "dumbbell"], ["سكوات أمامي", "barbell"], ["جوبلت سكوات", "dumbbell"], ["سكوات سميث", "machine"], ["طلوع درج دمبل (ستيب أب)", "dumbbell"]],
+  hamstrings:  [["ليج كيرل", "machine"], ["رومانيان ديدليفت", "barbell"], ["ليج كيرل جالس", "machine"], ["ديدليفت أرجل مفرودة دمبل", "dumbbell"]],
+  calves:      [["سمانة واقف", "machine"], ["سمانة جالس", "machine"], ["سمانة على الليج برس", "machine"]],
 };
 
 const STORE_KEY = "gymlog.v1";
@@ -687,7 +706,7 @@ function renderMuscle() {
       ? `آخر مرة <span class="num">${fmtW(top.w)}</span> كغ × <span class="num">${top.r}</span> · ${daysAgo(last.day)}`
       : `${TYPES[ex.type]} · ما سجلت لسا`;
     return `<button class="item" data-ex="${ex.id}">
-      <span class="ico">${I.type[ex.type] || I.type.machine}</span>
+      ${thumbHTML(ex)}
       <span class="grow"><b>${esc(ex.name)}</b><small>${sub}</small></span>
       ${best ? `<span class="end"><b class="num">${fmtW(best.maxW)}</b><small>أعلى كغ</small></span>` : `<span class="chev">${I.chev}</span>`}
     </button>`;
@@ -762,6 +781,22 @@ function chartSVG(points, unit) {
 
 const BOOK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8.5 8h7M8.5 11.5h5"/></svg>';
 const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.6 2.6 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4a2.6 2.6 0 0 0-1.8 1.8C2 8.8 2 12 2 12s0 3.2.4 4.8a2.6 2.6 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.6 2.6 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3z"/></svg>';
+const photoOf = id => (typeof PHOTOS !== "undefined" && PHOTOS[id]) || null;
+const photoSrc = (file, i) => `img/ex/${file}-${i}.webp`;
+function thumbHTML(ex) {
+  const ph = photoOf(ex.id);
+  return ph ? `<img class="thumb" src="${photoSrc(ph[0], ph[1])}" alt="" loading="lazy" decoding="async">`
+    : `<span class="ico">${I.type[ex.type] || I.type.machine}</span>`;
+}
+function photoHTML(ex) {
+  const ph = photoOf(ex.id);
+  if (!ph) return "";
+  return `<div class="card photo" role="img" aria-label="صورة توضيحية لتمرين ${esc(ex.name)}: وضعية البداية والنهاية">
+    <img class="f0" src="${photoSrc(ph[0], 0)}" alt="" decoding="async"><img class="f1" src="${photoSrc(ph[0], 1)}" alt="" decoding="async">
+    <div class="tag"><span class="s0">البداية</span><span class="s1">النهاية</span></div>
+    <span class="credit">Free Exercise DB</span>
+  </div>`;
+}
 function guideHTML(ex, open) {
   const g = (typeof GUIDES !== "undefined" && GUIDES[ex.id]) || null;
   const yt = `https://www.youtube.com/results?search_query=${encodeURIComponent((g ? g.en : ex.name) + (g ? " proper form" : " طريقة"))}`;
@@ -784,7 +819,7 @@ function guideHTML(ex, open) {
       </div>
       ${g.safe ? `<div class="safe"><span>${g.safe}</span></div>` : ""}
       <div class="foot">${video}<span class="muted" style="font-size:.75rem;direction:ltr">${esc(g.en)}</span></div>
-      <p class="note">إرشادات عامة مبنية على أسس التدريب المعتمدة (NSCA وACE)، ومش بديل عن مدرب أو طبيب. إذا حسيت بألم حاد، وقّف التمرين فوراً.</p>
+      <p class="note">إرشادات عامة مبنية على أسس التدريب المعتمدة (NSCA وACE)، ومش بديل عن مدرب أو طبيب. إذا حسيت بألم حاد، وقّف التمرين فوراً. الصور من Free Exercise DB (ملكية عامة).</p>
     </div>
   </details>`;
 }
@@ -848,6 +883,7 @@ function renderExercise() {
       <div class="titles"><div class="eyebrow">${MUSCLES[ex.muscle].name} · ${TYPES[ex.type]}</div><h1>${esc(ex.name)}</h1></div>
       ${best ? `<span class="chip pr">🏆 <span class="num">${fmtW(best.maxW)}</span></span>` : ""}
     </div>
+    ${photoHTML(ex)}
     ${guideHTML(ex, ui.guideOpen[ex.id] ?? !ses.length)}
     ${target}
     <div class="card stack">
