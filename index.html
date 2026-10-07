@@ -506,7 +506,7 @@ const PRESETS = {
   calves:      [["سمانة واقف", "machine"], ["سمانة جالس", "machine"], ["سمانة على الليج برس", "machine"], ["سمانة واقف بالبار", "barbell"]],
 };
 
-const APP_VERSION = "2026.10.04-3";
+const APP_VERSION = "2026.10.07-1";
 const STORE_KEY = "gymlog.v1";
 const DEFAULTS = () => ({ custom: [], sets: [], rest: 90, goal: 4, ranges: {}, recovery: {} });
 let db = DEFAULTS();
@@ -530,7 +530,8 @@ function allExercises() {
   return list.concat(db.custom.map(c => ({ ...c, custom: true })));
 }
 const exById = id => allExercises().find(e => e.id === id);
-// Exercises doable on a Speediance Gym Monster (two adjustable cable arms, bar, handles, rope, ankle straps, bench).
+// Exercises doable on a Speediance Gym Monster 2 (two adjustable cable arms, bar, handles, rope, ankle straps, bench).
+// The machine tops out at 100 kg total resistance and moves in 0.5 kg steps.
 const GM_IDS = new Set([
   "chest_upper-0", "chest_upper-3", "chest_upper-6", "chest_upper-7", "chest_mid-0", "chest_mid-4", "chest_mid-6", "chest_lower-2",
   "delt_front-0", "delt_front-5", "delt_front-6", "delt_side-1", "delt_side-3", "delt_rear-2", "delt_rear-3",
@@ -542,6 +543,8 @@ const GM_IDS = new Set([
   "quads-0", "quads-5", "quads-9", "hamstrings-1", "hamstrings-4", "calves-3",
 ]);
 const isGM = () => db.equip === "gm";
+const GM_MAX = 100;
+const capW = w => isGM() ? Math.min(GM_MAX, w) : w;
 const visibleEx = e => !isGM() || e.custom || GM_IDS.has(e.id);
 // Lists show what the current equipment allows; history and recovery always count every exercise.
 const exercisesOf = (m, all) => allExercises().filter(e => e.muscle === m && (all || visibleEx(e)));
@@ -666,13 +669,17 @@ function coach(ex) {
   const rec = recoveryToday(), zone = recZone(rec);
   const lower = LOWER.has(ex.muscle), pct = lower ? 5 : 2.5;
   let action, w = W, r, why, rule = "";
-  if (allTop && (prevTopSameW || lastRated === "e")) {
+  if (allTop && (prevTopSameW || lastRated === "e") && isGM() && W >= GM_MAX) {
+    action = "reps"; r = hi + 2;
+    why = `وصلت أقصى مقاومة بالجهاز (${GM_MAX} كغ). كمّل بزيادة العدّات، أو بطّئ النزول لـ 3 لـ 4 ثواني لتزيد الصعوبة.`;
+    rule = "أقصى وزن";
+  } else if (allTop && (prevTopSameW || lastRated === "e")) {
     const inc = roundTo(Math.max(W, 20) * pct / 100, loadStep(ex.type));
     if (zone === "red") {
       action = "hold"; r = hi;
       why = `جاهز تزيد الوزن، بس تعافيك اليوم أحمر (${rec}%). ثبّت على نفس الوزن اليوم وزيد بالجلسة الجاية.`;
     } else {
-      action = "up"; w = W + inc; r = lo;
+      action = "up"; w = capW(W + inc); r = lo;
       why = prevTopSameW
         ? `وصلت ${hi} عدّة بكل المجموعات جلستين ورا بعض. وقت تكسر الوزن: زيد ${fmtW(inc)} كغ (حوالي ${pct}%) وارجع لـ ${lo} عدّات.`
         : `وصلت ${hi} عدّة وكانت سهلة (3+ عدّات باقية). زيد ${fmtW(inc)} كغ وارجع لـ ${lo} عدّات.`;
@@ -1314,10 +1321,10 @@ function renderSettings() {
       <div class="spread"><div><div class="eyebrow">المعدّات</div><h3>وين بتتمرن؟</h3></div>
         <div class="seg" role="group" aria-label="المعدّات">
           <button type="button" data-equip="gym" aria-pressed="${!isGM()}">جيم</button>
-          <button type="button" data-equip="gm" aria-pressed="${isGM()}">Gym Monster</button>
+          <button type="button" data-equip="gm" aria-pressed="${isGM()}">Gym Monster 2</button>
         </div></div>
       <small class="muted">${isGM()
-        ? "وضع Gym Monster: بتطلعلك بس التمارين اللي بتنعمل على الجهاز (كيبل، بار، مقابض، حبل، حزام كاحل، بنش). الوزن بيزيد بخطوات نص كيلو، وحاسبة الأقراص مخفية. سجّل الوزن الكلي اللي بتختاره بالجهاز."
+        ? "وضع Gym Monster 2: بتطلعلك بس التمارين اللي بتنعمل على الجهاز (كيبل، بار، مقابض، حبل، حزام كاحل، بنش). الوزن بيزيد بخطوات نص كيلو لحد أقصى مقاومة الجهاز (100 كغ)، وحاسبة الأقراص مخفية. سجّل الوزن الكلي اللي بتختاره بالجهاز."
         : "وضع الجيم: كل التمارين والأجهزة، وزيادات الوزن حسب أوزان الجيم (2.5 كغ للبار والأجهزة)."}</small>
     </div>
     <div class="card stack">
@@ -1427,7 +1434,7 @@ function readDraft() {
   const d = ui.drafts[ui.ex];
   const w = parseFloat(document.getElementById("w-input")?.value);
   const r = parseInt(document.getElementById("r-input")?.value, 10);
-  if (!isNaN(w)) d.w = Math.max(0, w);
+  if (!isNaN(w)) d.w = capW(Math.max(0, w));
   if (!isNaN(r)) d.r = Math.max(1, r);
   return d;
 }
@@ -1494,14 +1501,14 @@ document.addEventListener("click", e => {
   if (t.dataset.step) {
     const [k, v] = t.dataset.step.split(":");
     const d = readDraft();
-    d[k] = k === "w" ? Math.max(0, Math.round((d.w + +v) * 100) / 100) : Math.max(1, d.r + +v);
+    d[k] = k === "w" ? capW(Math.max(0, Math.round((d.w + +v) * 100) / 100)) : Math.max(1, d.r + +v);
     document.getElementById(k === "w" ? "w-input" : "r-input").value = k === "w" ? fmtW(d.w) : d.r;
     if (k === "w") { const p = document.getElementById("plates"); if (p) p.innerHTML = platesHTML(d.w); }
     return;
   }
   if (t.dataset.equip) {
     db.equip = t.dataset.equip; save(); ui.drafts = {}; refresh();
-    toast(isGM() ? "تفعّل وضع Gym Monster" : "رجعت لوضع الجيم");
+    toast(isGM() ? "تفعّل وضع Gym Monster 2" : "رجعت لوضع الجيم");
     return;
   }
   if (t.dataset.range) {

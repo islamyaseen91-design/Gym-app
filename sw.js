@@ -1,6 +1,6 @@
 // Offline support. App code (pages, scripts, manifest) is network-first so updates show on the next open;
 // images and fonts are cache-first. Bump CACHE when the shell list changes.
-const CACHE = "gym-log-v10";
+const CACHE = "gym-log-v11";
 const SHELL = ["./", "index.html", "guides.js", "manifest.json", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", e => {
