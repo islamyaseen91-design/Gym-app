@@ -485,25 +485,25 @@ const MUSCLES = {
 const TYPES = { barbell: "بار", dumbbell: "دمبل", machine: "جهاز", cable: "كيبل", bodyweight: "وزن الجسم" };
 
 const PRESETS = {
-  chest_upper: [["بنش مائل بار", "barbell"], ["بنش مائل دمبل", "dumbbell"], ["تفتيح مائل دمبل", "dumbbell"], ["كيبل كروس من تحت لفوق", "cable"], ["بنش مائل سميث", "machine"], ["جهاز ضغط صدر مائل", "machine"], ["ضغط صدر مائل كيبل", "cable"], ["تفتيح مائل كيبل", "cable"]],
-  chest_mid:   [["بنش مستوي بار", "barbell"], ["بنش مستوي دمبل", "dumbbell"], ["جهاز ضغط صدر", "machine"], ["بيك ديك (فراشة)", "machine"], ["ضغط (بوش أب)", "bodyweight"], ["تفتيح مستوي دمبل", "dumbbell"], ["ضغط صدر كيبل واقف", "cable"]],
-  chest_lower: [["بنش مقلوب بار", "barbell"], ["متوازي (ديبس)", "bodyweight"], ["كيبل كروس من فوق لتحت", "cable"], ["بنش مقلوب دمبل", "dumbbell"]],
-  delt_front:  [["ضغط أكتاف بار", "barbell"], ["ضغط أكتاف دمبل", "dumbbell"], ["رفرفة أمامي دمبل", "dumbbell"], ["أرنولد برس", "dumbbell"], ["جهاز ضغط أكتاف", "machine"], ["ضغط أكتاف كيبل", "cable"], ["رفرفة أمامي كيبل", "cable"]],
-  delt_side:   [["رفرفة جانبي دمبل", "dumbbell"], ["رفرفة جانبي كيبل", "cable"], ["جهاز رفرفة جانبي", "machine"], ["سحب عمودي بار (أبرايت رو)", "barbell"]],
-  delt_rear:   [["رفرفة خلفي دمبل", "dumbbell"], ["جهاز فراشة عكسي", "machine"], ["فيس بول", "cable"], ["رفرفة خلفي كيبل", "cable"]],
-  biceps:      [["بايسبس بار", "barbell"], ["بايسبس دمبل", "dumbbell"], ["هامر", "dumbbell"], ["بايسبس كيبل", "cable"], ["بايسبس ارتكاز (بريتشر)", "barbell"], ["بايسبس دمبل على بنش مائل", "dumbbell"], ["بايسبس تركيز", "dumbbell"], ["هامر كيبل حبل", "cable"]],
-  triceps:     [["تراي كيبل حبل", "cable"], ["فرنش برس", "barbell"], ["تراي فوق الراس دمبل", "dumbbell"], ["بنش ضيق", "barbell"], ["تراي كيبل بار", "cable"], ["متوازي تراي", "bodyweight"], ["كيك باك دمبل", "dumbbell"], ["تراي كيبل فوق الراس", "cable"], ["تراي كيبل مستلقي", "cable"]],
+  chest_upper: [["بنش مائل بار", "barbell"], ["بنش مائل دمبل", "dumbbell"], ["تفتيح مائل دمبل", "dumbbell"], ["كيبل كروس من تحت لفوق", "cable"], ["بنش مائل سميث", "machine"], ["جهاز ضغط صدر مائل", "machine"], ["ضغط صدر مائل كيبل", "cable"], ["تفتيح مائل كيبل", "cable"], ["بوش أب مائل لتحت (رجلين على البنش)", "bodyweight"]],
+  chest_mid:   [["بنش مستوي بار", "barbell"], ["بنش مستوي دمبل", "dumbbell"], ["جهاز ضغط صدر", "machine"], ["بيك ديك (فراشة)", "machine"], ["ضغط (بوش أب)", "bodyweight"], ["تفتيح مستوي دمبل", "dumbbell"], ["ضغط صدر كيبل واقف", "cable"], ["تفتيح كيبل على بنش مستوي", "cable"], ["بوش أب واسع", "bodyweight"]],
+  chest_lower: [["بنش مقلوب بار", "barbell"], ["متوازي (ديبس)", "bodyweight"], ["كيبل كروس من فوق لتحت", "cable"], ["بنش مقلوب دمبل", "dumbbell"], ["بوش أب على البنش (إيدين مرفوعة)", "bodyweight"], ["كيبل كروس نازل يد وحدة", "cable"]],
+  delt_front:  [["ضغط أكتاف بار", "barbell"], ["ضغط أكتاف دمبل", "dumbbell"], ["رفرفة أمامي دمبل", "dumbbell"], ["أرنولد برس", "dumbbell"], ["جهاز ضغط أكتاف", "machine"], ["ضغط أكتاف كيبل", "cable"], ["رفرفة أمامي كيبل", "cable"], ["ضغط أكتاف بالبار قاعد", "barbell"], ["رفرفة أمامي بالبار", "barbell"]],
+  delt_side:   [["رفرفة جانبي دمبل", "dumbbell"], ["رفرفة جانبي كيبل", "cable"], ["جهاز رفرفة جانبي", "machine"], ["سحب عمودي بار (أبرايت رو)", "barbell"], ["سحب عمودي كيبل بالبار", "cable"], ["رفرفة جانبي كيبل عبر الجسم", "cable"]],
+  delt_rear:   [["رفرفة خلفي دمبل", "dumbbell"], ["جهاز فراشة عكسي", "machine"], ["فيس بول", "cable"], ["رفرفة خلفي كيبل", "cable"], ["تجديف خلفي كيبل حبل", "cable"], ["تجديف خلفي بالبار", "barbell"]],
+  biceps:      [["بايسبس بار", "barbell"], ["بايسبس دمبل", "dumbbell"], ["هامر", "dumbbell"], ["بايسبس كيبل", "cable"], ["بايسبس ارتكاز (بريتشر)", "barbell"], ["بايسبس دمبل على بنش مائل", "dumbbell"], ["بايسبس تركيز", "dumbbell"], ["هامر كيبل حبل", "cable"], ["بايسبس كيبل يد وحدة", "cable"], ["بايسبس كيبل مستلقي", "cable"], ["بايسبس بالبار قبضة عكسية", "barbell"], ["دراغ كيرل بالبار", "barbell"], ["سبايدر كيرل بالبار", "barbell"]],
+  triceps:     [["تراي كيبل حبل", "cable"], ["فرنش برس", "barbell"], ["تراي فوق الراس دمبل", "dumbbell"], ["بنش ضيق", "barbell"], ["تراي كيبل بار", "cable"], ["متوازي تراي", "bodyweight"], ["كيك باك دمبل", "dumbbell"], ["تراي كيبل فوق الراس", "cable"], ["تراي كيبل مستلقي", "cable"], ["تراي كيبل قبضة عكسية", "cable"], ["تراي كيبل على بنش مائل", "cable"], ["تراي على البنش (بنش ديبس)", "bodyweight"]],
   forearms:    [["رسغ بار", "barbell"], ["رسغ عكسي", "barbell"], ["رسغ كيبل", "cable"]],
-  abs:         [["كرنش", "bodyweight"], ["رفع رجلين معلّق", "bodyweight"], ["كرنش كيبل", "cable"], ["بلانك (بالثواني)", "bodyweight"], ["عجلة البطن", "bodyweight"], ["كرنش عكسي", "bodyweight"], ["كرنش عكسي كيبل", "cable"]],
-  obliques:    [["روسيان تويست", "bodyweight"], ["ميلان جانبي دمبل", "dumbbell"], ["وود تشوب كيبل", "cable"], ["كرنش دراجة", "bodyweight"], ["بالوف برس", "cable"]],
-  traps:       [["شرغ بار", "barbell"], ["شرغ دمبل", "dumbbell"], ["شرغ كيبل", "cable"]],
-  upper_back:  [["تجديف بار", "barbell"], ["تجديف دمبل", "dumbbell"], ["تجديف كيبل جالس", "cable"], ["تجديف T-بار", "machine"], ["تجديف جهاز", "machine"], ["تجديف دمبل على بنش مائل", "dumbbell"], ["تجديف كيبل يد وحدة", "cable"]],
-  lats:        [["سحب أمامي", "cable"], ["عقلة", "bodyweight"], ["بول أوفر كيبل", "cable"], ["عقلة قبضة عكسية (تشن أب)", "bodyweight"], ["سحب أمامي قبضة ضيقة", "cable"], ["سحب كيبل يد وحدة", "cable"]],
-  lower_back:  [["ديدليفت", "barbell"], ["ظهر سفلي (هايبر)", "bodyweight"], ["جود مورنينج", "barbell"]],
-  glutes:      [["هيب ثرست بار", "barbell"], ["بلغاري سكوات", "dumbbell"], ["جهاز أبداكتور", "machine"], ["كيك باك كيبل", "cable"], ["جسر المؤخرة بار", "barbell"], ["سومو ديدليفت", "barbell"], ["بول ثرو كيبل", "cable"], ["أبداكشن كيبل واقف", "cable"]],
-  quads:       [["سكوات بار", "barbell"], ["ليج برس", "machine"], ["ليج إكستنشن", "machine"], ["هاك سكوات", "machine"], ["لانجز دمبل", "dumbbell"], ["سكوات أمامي", "barbell"], ["جوبلت سكوات", "dumbbell"], ["سكوات سميث", "machine"], ["طلوع درج دمبل (ستيب أب)", "dumbbell"], ["سبليت سكوات بالبار", "barbell"]],
-  hamstrings:  [["ليج كيرل", "machine"], ["رومانيان ديدليفت", "barbell"], ["ليج كيرل جالس", "machine"], ["ديدليفت أرجل مفرودة دمبل", "dumbbell"], ["ليج كيرل كيبل واقف", "cable"]],
-  calves:      [["سمانة واقف", "machine"], ["سمانة جالس", "machine"], ["سمانة على الليج برس", "machine"], ["سمانة واقف بالبار", "barbell"]],
+  abs:         [["كرنش", "bodyweight"], ["رفع رجلين معلّق", "bodyweight"], ["كرنش كيبل", "cable"], ["بلانك (بالثواني)", "bodyweight"], ["عجلة البطن", "bodyweight"], ["كرنش عكسي", "bodyweight"], ["كرنش عكسي كيبل", "cable"], ["كرنش كيبل جالس", "cable"]],
+  obliques:    [["روسيان تويست", "bodyweight"], ["ميلان جانبي دمبل", "dumbbell"], ["وود تشوب كيبل", "cable"], ["كرنش دراجة", "bodyweight"], ["بالوف برس", "cable"], ["كرنش كيبل مع لفّ", "cable"]],
+  traps:       [["شرغ بار", "barbell"], ["شرغ دمبل", "dumbbell"], ["شرغ كيبل", "cable"], ["شرغ بالبار خلف الظهر", "barbell"]],
+  upper_back:  [["تجديف بار", "barbell"], ["تجديف دمبل", "dumbbell"], ["تجديف كيبل جالس", "cable"], ["تجديف T-بار", "machine"], ["تجديف جهاز", "machine"], ["تجديف دمبل على بنش مائل", "dumbbell"], ["تجديف كيبل يد وحدة", "cable"], ["تجديف بالبار قبضة عكسية", "barbell"], ["تجديف كيبل للرقبة (حبل)", "cable"]],
+  lats:        [["سحب أمامي", "cable"], ["عقلة", "bodyweight"], ["بول أوفر كيبل", "cable"], ["عقلة قبضة عكسية (تشن أب)", "bodyweight"], ["سحب أمامي قبضة ضيقة", "cable"], ["سحب كيبل يد وحدة", "cable"], ["سحب كيبل قبضة عكسية", "cable"], ["بول أوفر كيبل حبل", "cable"]],
+  lower_back:  [["ديدليفت", "barbell"], ["ظهر سفلي (هايبر)", "bodyweight"], ["جود مورنينج", "barbell"], ["سوبرمان", "bodyweight"]],
+  glutes:      [["هيب ثرست بار", "barbell"], ["بلغاري سكوات", "dumbbell"], ["جهاز أبداكتور", "machine"], ["كيك باك كيبل", "cable"], ["جسر المؤخرة بار", "barbell"], ["سومو ديدليفت", "barbell"], ["بول ثرو كيبل", "cable"], ["أبداكشن كيبل واقف", "cable"], ["كيك باك على الركب", "bodyweight"]],
+  quads:       [["سكوات بار", "barbell"], ["ليج برس", "machine"], ["ليج إكستنشن", "machine"], ["هاك سكوات", "machine"], ["لانجز دمبل", "dumbbell"], ["سكوات أمامي", "barbell"], ["جوبلت سكوات", "dumbbell"], ["سكوات سميث", "machine"], ["طلوع درج دمبل (ستيب أب)", "dumbbell"], ["سبليت سكوات بالبار", "barbell"], ["بوكس سكوات (على البنش)", "barbell"], ["سكوات بالبار وقفة ضيقة", "barbell"], ["سكوات بالبار وقفة عريضة", "barbell"], ["ليج إكستنشن كيبل (حزام الكاحل)", "cable"]],
+  hamstrings:  [["ليج كيرل", "machine"], ["رومانيان ديدليفت", "barbell"], ["ليج كيرل جالس", "machine"], ["ديدليفت أرجل مفرودة دمبل", "dumbbell"], ["ليج كيرل كيبل واقف", "cable"], ["ديدليفت أرجل مفرودة بالبار", "barbell"], ["ليج كيرل كيبل على البطن", "cable"]],
+  calves:      [["سمانة واقف", "machine"], ["سمانة جالس", "machine"], ["سمانة على الليج برس", "machine"], ["سمانة واقف بالبار", "barbell"], ["سمانة جالس بالبار", "barbell"], ["سمانة رجل وحدة (مقبض كيبل)", "cable"]],
 };
 
 const APP_VERSION = "2026.10.07-1";
@@ -541,6 +541,8 @@ const GM_IDS = new Set([
   "upper_back-0", "upper_back-2", "upper_back-6", "lats-0", "lats-2", "lats-4", "lats-5",
   "lower_back-0", "lower_back-2", "glutes-0", "glutes-3", "glutes-4", "glutes-5", "glutes-6", "glutes-7",
   "quads-0", "quads-5", "quads-9", "hamstrings-1", "hamstrings-4", "calves-3",
+  // Added for the full Gym Monster 2 kit (adjustable bench, rowing platform).
+  "chest_upper-8", "chest_mid-7", "chest_mid-8", "chest_lower-4", "chest_lower-5", "delt_front-7", "delt_front-8", "delt_side-4", "delt_side-5", "delt_rear-4", "delt_rear-5", "biceps-8", "biceps-9", "biceps-10", "biceps-11", "biceps-12", "triceps-9", "triceps-10", "triceps-11", "abs-7", "obliques-5", "traps-3", "upper_back-7", "upper_back-8", "lats-6", "lats-7", "lower_back-3", "glutes-8", "quads-10", "quads-11", "quads-12", "quads-13", "hamstrings-5", "hamstrings-6", "calves-4", "calves-5",
 ]);
 const isGM = () => db.equip === "gm";
 const GM_MAX = 100;
