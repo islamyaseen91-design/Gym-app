@@ -68,7 +68,7 @@ button { cursor: pointer; }
 
 /* Clear the phone's status bar (time, battery) when installed to the home screen. */
 .app { max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: calc(20px + env(safe-area-inset-top, 0px)) 130px; }
-body[data-view="exercise"] .app { padding-bottom: 120px; }
+body[data-view="exercise"] .app, body[data-view="builder"] .app { padding-bottom: 120px; }
 h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.3; font-weight: 700; }
 h1 { font-size: 1.65rem; font-weight: 800; letter-spacing: -0.01em; }
 h2 { font-size: 1.15rem; }
@@ -424,7 +424,47 @@ textarea.input { min-height: 110px; direction: ltr; font-family: ui-monospace, m
 .nav button { border: 0; background: transparent; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--ink-muted); font-size: .7rem; font-weight: 600; border-radius: 18px; transition: color .2s, background .2s; }
 .nav button svg { width: 22px; height: 22px; }
 .nav button[aria-current="page"] { color: var(--ink); background: var(--ink-fg); }
-body[data-view="exercise"] .nav { display: none; }
+body[data-view="exercise"] .nav, body[data-view="builder"] .nav { display: none; }
+
+/* ---------- today's workout ---------- */
+.mini { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 5px 12px; font-size: .8rem; font-weight: 600; white-space: nowrap; }
+.mini.icon { width: 32px; height: 32px; padding: 0; display: inline-grid; place-items: center; font-size: .95rem; }
+.mini.icon svg { width: 14px; height: 14px; }
+.mini[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--ink-fg); }
+.mini:disabled { opacity: .35; }
+.gchips { display: flex; flex-wrap: wrap; gap: 8px; }
+.gchips button { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 9px 18px; font-weight: 600; font-size: .92rem; }
+.gchips button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.ttypes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ttypes button { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: var(--r-sm); padding: 10px 12px; text-align: start; display: flex; flex-direction: column; gap: 2px; }
+.ttypes button b { font-family: var(--font-display); font-weight: 700; }
+.ttypes button small { font-size: .74rem; color: var(--muted); }
+.ttypes button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--ink-fg); }
+.ttypes button[aria-pressed="true"] small { color: var(--ink-muted); }
+.bitem { gap: 10px; padding: 11px 12px; }
+.bitem .thumb, .bitem .ico { width: 52px; height: 40px; }
+.bnum { font-family: var(--font-num); font-weight: 800; font-size: 1.2rem; color: var(--muted); width: 18px; text-align: center; flex: none; }
+.bact { display: flex; gap: 4px; flex: none; }
+.picker { background: var(--surface-2); padding: 12px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line-soft); }
+.pick-list { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.pick { flex: none; width: 112px; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; padding: 6px; display: flex; flex-direction: column; gap: 6px; text-align: start; color: var(--fg); font-size: .78rem; line-height: 1.35; }
+.pick .thumb, .pick .ico { width: 100%; height: 64px; border-radius: 10px; }
+.pick .ico svg { width: 26px; height: 26px; }
+.bitem .grow small .num { white-space: nowrap; font-size: .95rem; }
+.wkbar { display: flex; gap: 4px; direction: rtl; }
+.wkbar button { flex: 1; height: 8px; border: 0; border-radius: 4px; background: var(--surface-3); padding: 0; }
+.wkbar button.done { background: var(--ready); }
+.wkbar button.cur { background: var(--accent); }
+.setcount { font-size: .9rem; color: var(--fg-2); }
+.setcount b { font-family: var(--font-num); font-size: 1.25rem; color: var(--fg); }
+.progress { height: 8px; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--ready); border-radius: 4px; }
+.wklist { background: var(--surface-2); }
+.wklist .item { padding: 10px 12px; }
+.wklist .thumb, .wklist .ico { width: 52px; height: 40px; }
+.wkdone { font-family: var(--font-num); font-weight: 700; font-size: 1.1rem; color: var(--muted); direction: ltr; unicode-bidi: isolate; flex: none; }
+.wkdone.ok { color: var(--ready-t); }
+.wkfin { text-align: center; font-family: var(--font-display); font-weight: 700; padding: 12px; border-radius: var(--r-md); background: #DDF3E6; color: var(--ready-t); }
 .logbar { position: fixed; inset-inline: 0; bottom: 0; z-index: 10; padding: 0 16px calc(14px + env(safe-area-inset-bottom, 0px)); }
 .logbar .cta { max-width: 528px; margin: 0 auto; height: 60px; border-radius: 20px; box-shadow: 0 12px 28px rgb(35 70 232 / .28); }
 
@@ -502,7 +542,7 @@ body[data-view="exercise"] .timer { bottom: calc(86px + env(safe-area-inset-bott
     <button type="button" class="skip" id="rest-skip">تخطّي</button>
   </div>
   <div class="next" id="rest-next" hidden>
-    <span class="eyebrow" style="color:var(--ink-muted)">المجموعة الجاية</span>
+    <span class="eyebrow" style="color:var(--ink-muted)" id="rest-nl">المجموعة الجاية</span>
     <div class="big"><b class="num" id="rest-nw"></b><span>كغ ×</span><b class="num" id="rest-nr"></b><em id="rest-prev"></em></div>
   </div>
   <p class="hint" id="rest-hint">التمارين الكبيرة متل السكوات والبنش بتحتاج راحة أطول، من دقيقتين لثلاث.</p>
@@ -590,7 +630,7 @@ const PRESETS = {
   calves:      [["سمانة واقف", "machine"], ["سمانة جالس", "machine"], ["سمانة على الليج برس", "machine"], ["سمانة واقف بالبار", "barbell"], ["سمانة جالس بالبار", "barbell"], ["سمانة رجل وحدة (مقبض كيبل)", "cable"]],
 };
 
-const APP_VERSION = "2026.10.08-1";
+const APP_VERSION = "2026.10.08-2";
 const STORE_KEY = "gymlog.v1";
 const DEFAULTS = () => ({ custom: [], sets: [], rest: 90, goal: 4, ranges: {}, recovery: {} });
 let db = DEFAULTS();
@@ -705,7 +745,7 @@ function defaultRange(ex) {
   if (["abs", "obliques", "calves", "forearms"].includes(ex.muscle)) return [12, 20];
   return { barbell: [6, 10], machine: [8, 12], dumbbell: [8, 12], cable: [10, 15], bodyweight: [8, 12] }[ex.type] || [8, 12];
 }
-const rangeOf = ex => (db.ranges && db.ranges[ex.id]) || defaultRange(ex);
+const rangeOf = ex => wkRange(ex) || (db.ranges && db.ranges[ex.id]) || defaultRange(ex);
 const loadStep = type => isGM() ? 0.5 : type === "dumbbell" ? 2 : 2.5;
 const roundTo = (x, step) => Math.max(step, Math.round(x / step) * step);
 // Working sets = the sets done at the session's heaviest weight.
@@ -1022,6 +1062,153 @@ function planToday() {
   return { name: g.name, exs, since: g.t ? daysAgo(dayKey(g.t)) : null };
 }
 
+/* ---------- today's workout ----------
+   Optional one-day plan: pick muscle groups and the app fills in exercises (most-used first, round-robin
+   across the group's muscles). Each exercise gets N sets; logging the last one moves on to the next exercise.
+   The training type sets the rep range and rest for the plan's exercises, for today only. */
+const TT = {
+  auto:     { name: "حسب التمرين", range: null, rest: null },
+  strength: { name: "قوة", range: [5, 8], rest: 180 },
+  hyper:    { name: "تضخيم", range: [8, 12], rest: 90 },
+  endur:    { name: "تحمّل", range: [12, 20], rest: 60 },
+};
+function wk() { const w = db.workout; return w && w.day === todayKey() && w.items.length ? w : null; }
+function wkRange(ex) { const w = wk(); return w && w.items.includes(ex.id) ? TT[w.type]?.range || null : null; }
+const doneToday = id => db.sets.filter(s => s.ex === id && dayKey(s.t) === todayKey()).length;
+const wkNext = w => w.items.find(id => doneToday(id) < w.sets);
+const GROUPS = [...new Set(Object.values(MUSCLES).map(m => m.group))];
+const groupMuscles = g => Object.keys(MUSCLES).filter(m => MUSCLES[m].group === g && exercisesOf(m).length);
+function rankedEx(m, shuffle) {
+  const list = exercisesOf(m).slice();
+  if (!shuffle) return list.sort((a, b) => setsOf(b.id).length - setsOf(a.id).length);
+  for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+  return list;
+}
+function buildWorkout(groups, shuffle) {
+  const per = groups.length === 1 ? 5 : groups.length === 2 ? 3 : 2;
+  const items = [];
+  for (const g of groups) {
+    const lists = groupMuscles(g).map(m => rankedEx(m, shuffle));
+    let n = 0;
+    for (let round = 0; n < per && round < 8; round++)
+      for (const l of lists) {
+        if (n >= per) break;
+        if (l[round] && !items.includes(l[round].id)) { items.push(l[round].id); n++; }
+      }
+  }
+  return items;
+}
+function initBld() {
+  const w = wk();
+  if (w) return { groups: w.groups.slice(), type: w.type, sets: w.sets, items: w.items.slice(), pick: null };
+  const p = planToday(), groups = [p ? p.name : GROUPS[0]];
+  return { groups, type: "auto", sets: 3, items: buildWorkout(groups), pick: null };
+}
+function openBuilder() { ui.bld = initBld(); go("builder"); }
+function startWorkout() {
+  const b = ui.bld;
+  if (!b || !b.items.length) return;
+  db.workout = { day: todayKey(), groups: b.groups.slice(), type: b.type, sets: b.sets, items: b.items.slice() };
+  save(); ui.drafts = {}; ui.bld = null;
+  go("exercise", { ex: wkNext(db.workout) || b.items[0] });
+}
+
+function pickerHTML(m) {
+  const b = ui.bld;
+  const gs = b.groups.length ? b.groups : GROUPS;
+  // Swapping offers the same muscle first, then the rest of its group; adding offers the chosen groups.
+  const ms = m ? [...new Set([m, ...groupMuscles(MUSCLES[m].group)])] : gs.flatMap(groupMuscles);
+  const html = ms.map(mm => {
+    const list = exercisesOf(mm).filter(e => !b.items.includes(e.id));
+    return list.length ? `<div class="eyebrow">${MUSCLES[mm].name}</div><div class="pick-list">${list.map(e =>
+      `<button type="button" class="pick" data-bpick="${e.id}">${thumbHTML(e)}<span>${esc(e.name)}</span></button>`).join("")}</div>` : "";
+  }).join("");
+  return `<div class="picker">${html || '<small class="muted">ما في تمارين ثانية.</small>'}</div>`;
+}
+
+function renderBuilder() {
+  const b = ui.bld ||= initBld();
+  const tt = TT[b.type];
+  const reps = ex => { const [lo, hi] = tt.range || (db.ranges && db.ranges[ex.id]) || defaultRange(ex); return `${b.sets} × ${lo}–${hi}`; };
+  const rows = b.items.map((id, i) => {
+    const ex = exById(id);
+    if (!ex) return "";
+    return `<div class="item bitem"><span class="bnum">${i + 1}</span>${thumbHTML(ex)}
+      <span class="grow"><b>${esc(ex.name)}</b><small>${MUSCLES[ex.muscle].name} · <span class="num" dir="ltr">${reps(ex)}</span></small></span>
+      <span class="bact">
+        <button type="button" class="mini" data-bswap="${i}" aria-pressed="${b.pick === i}">بدّل</button>
+        <button type="button" class="mini icon" data-bup="${i}" aria-label="طلّع ${esc(ex.name)} لفوق"${i ? "" : " disabled"}>↑</button>
+        <button type="button" class="mini icon" data-brm="${i}" aria-label="شيل ${esc(ex.name)}">${I.x}</button>
+      </span></div>${b.pick === i ? pickerHTML(ex.muscle) : ""}`;
+  }).join("");
+  return `<div class="stack enter">
+    <div class="topbar">
+      <button class="iconbtn" data-back aria-label="رجوع">${I.back}</button>
+      <div class="titles"><div class="eyebrow">برنامج ليوم واحد</div><h1>تمرين اليوم</h1></div>
+    </div>
+    <div class="card stack">
+      <div><h3>شو بدك تتمرن؟</h3><small class="muted">اختار عضلة أو أكثر، مثلاً الصدر والأكتاف.</small></div>
+      <div class="gchips" role="group" aria-label="العضلات">${GROUPS.filter(g => groupMuscles(g).length).map(g =>
+        `<button type="button" data-bgroup="${g}" aria-pressed="${b.groups.includes(g)}">${g}</button>`).join("")}</div>
+    </div>
+    <div class="card stack">
+      <h3>نوع التدريب</h3>
+      <div class="ttypes" role="group" aria-label="نوع التدريب">${Object.entries(TT).map(([k, t]) =>
+        `<button type="button" data-btype="${k}" aria-pressed="${b.type === k}"><b>${t.name}</b><small>${t.range
+          ? `<span class="num" dir="ltr">${t.range[0]}–${t.range[1]}</span> عدّة · راحة <span class="num" dir="ltr">${fmtClock(t.rest)}</span>`
+          : "نطاق كل تمرين وراحتك العادية"}</small></button>`).join("")}</div>
+      <div class="spread"><span class="eyebrow">مجموعات لكل تمرين</span>
+        <div class="seg" role="group" aria-label="مجموعات لكل تمرين">${[2, 3, 4, 5].map(n =>
+          `<button type="button" data-bsets="${n}" aria-pressed="${b.sets === n}"><span class="num">${n}</span></button>`).join("")}</div></div>
+      <small class="muted">بعد ما تخلص <span class="num">${b.sets}</span> مجموعات من كل تمرين، التطبيق بينقلك لحاله عالتمرين اللي بعده.</small>
+    </div>
+    <div class="stack" style="gap:8px">
+      <div class="spread" style="padding-inline:4px"><h3>التمارين <span class="muted num">(${b.items.length})</span></h3>
+        ${b.groups.length ? `<button type="button" class="mini" data-breroll>اقتراح ثاني</button>` : ""}</div>
+      <div class="list">${rows || `<div class="empty"><b>ما في تمارين</b>اختار عضلة من فوق، أو ضيف تمرين.</div>`}</div>
+      <button type="button" class="btn ghost" data-bswap="add" aria-pressed="${b.pick === "add"}">+ ضيف تمرين</button>
+      ${b.pick === "add" ? `<div class="list">${pickerHTML(null)}</div>` : ""}
+    </div>
+    <div class="logbar"><button class="cta" type="button" data-bstart${b.items.length ? "" : " disabled"}>${wk() ? "احفظ وكمّل" : "ابدأ التمرين"} ${I.chev}</button></div>
+  </div>`;
+}
+
+function wkCardHTML(w) {
+  const total = w.items.length * w.sets;
+  const done = w.items.reduce((a, id) => a + Math.min(w.sets, doneToday(id)), 0);
+  const nxt = wkNext(w), nx = nxt && exById(nxt);
+  return `<div class="card plan">
+    <div class="spread" style="align-items:flex-start">
+      <div><div class="eyebrow">تمرين اليوم</div><h2>${w.groups.map(esc).join(" + ") || "تمرين حر"}</h2>
+        <small class="muted">${TT[w.type].name} · <span class="num">${w.sets}</span> مجموعات لكل تمرين</small></div>
+      <span class="chip ${nxt ? "accent" : "ready"}"><span class="num" dir="ltr">${done}/${total}</span></span>
+    </div>
+    <div class="progress" role="img" aria-label="خلصت ${done} من ${total} مجموعة"><i style="width:${Math.round(done / total * 100)}%"></i></div>
+    <div class="list wklist">${w.items.map(id => {
+      const ex = exById(id);
+      if (!ex) return "";
+      const d = doneToday(id);
+      return `<button class="item" data-ex="${id}">${thumbHTML(ex)}<span class="grow"><b>${esc(ex.name)}</b><small>${MUSCLES[ex.muscle].name}</small></span>
+        <span class="wkdone${d >= w.sets ? " ok" : ""}">${Math.min(d, w.sets)}/${w.sets}</span></button>`;
+    }).join("")}</div>
+    ${nx ? `<button class="cta" type="button" data-ex="${nxt}">${done ? "كمّل" : "ابدأ"}: ${esc(nx.name)} ${I.chev}</button>` : `<div class="wkfin">🎉 خلصت تمرين اليوم</div>`}
+    <div class="row"><button class="btn" type="button" data-bopen>عدّل البرنامج</button><button class="btn danger" type="button" data-confirm="end-wk">إنهاء البرنامج</button></div>
+  </div>`;
+}
+
+function wkStripHTML(ex) {
+  const w = wk();
+  if (!w || !w.items.includes(ex.id)) return "";
+  const i = w.items.indexOf(ex.id), n = w.items.length, done = doneToday(ex.id), tt = TT[w.type];
+  return `<div class="card stack" style="gap:10px">
+    <div class="spread"><span class="eyebrow">تمرين اليوم · <span class="num">${i + 1}</span> من <span class="num">${n}</span></span>
+      ${tt.range ? `<span class="chip accent">${tt.name} <span class="num" dir="ltr">${tt.range[0]}–${tt.range[1]}</span></span>` : ""}</div>
+    <div class="wkbar">${w.items.map((id, j) => `<button type="button" data-ex="${id}" class="${doneToday(id) >= w.sets ? "done" : j === i ? "cur" : ""}" aria-label="${esc(exById(id)?.name || "")}"></button>`).join("")}</div>
+    <div class="spread"><span class="setcount">${done >= w.sets ? `خلصت <b class="num">${w.sets}</b> مجموعات` : `المجموعة <b class="num">${done + 1}</b> من <b class="num">${w.sets}</b>`}</span>
+      <span class="row" style="gap:6px">${i > 0 ? `<button type="button" class="mini" data-ex="${w.items[i - 1]}">السابق</button>` : ""}${i < n - 1 ? `<button type="button" class="mini" data-ex="${w.items[i + 1]}">الجاي</button>` : ""}</span></div>
+  </div>`;
+}
+
 function weekBarsHTML() {
   const w = weekInfo(), goal = db.goal || 4;
   const vols = w.days.map(d => db.sets.filter(s => dayKey(s.t) === d.k).reduce((a, s) => a + s.w * s.r, 0));
@@ -1045,7 +1232,7 @@ function renderHome() {
       <button class="iconbtn" data-go="settings" aria-label="الإعدادات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg></button>
     </div>
     ${heroHTML()}
-    ${plan ? `<div class="card plan">
+    ${wk() ? wkCardHTML(wk()) : plan ? `<div class="card plan">
       <div class="spread" style="align-items:flex-start">
         <div><div class="eyebrow">مقترح لليوم</div><h2>${plan.name}</h2>
           <small class="muted">${plan.since ? `آخر مرة ${plan.since}` : "ما تمرنتها لسا"}</small></div>
@@ -1054,6 +1241,7 @@ function renderHome() {
       <div class="chips">${plan.exs.map(e => `<span>${esc(e.name)}</span>`).join("")}</div>
       <button class="cta" type="button" data-ex="${plan.exs[0].id}">ابدأ الجلسة ${I.chev}</button>
     </div>` : ""}
+    ${wk() ? "" : `<button class="btn" type="button" data-bopen style="padding:16px">＋ ابنِ برنامج لليوم (مثلاً صدر وكتاف)</button>`}
     ${weekBarsHTML()}
   </div>`;
 }
@@ -1315,7 +1503,8 @@ function renderExercise() {
 
   const ACT = { up: ["كسر وزن", "ready"], confirm: ["تأكيد", "accent"], reps: ["زيد عدّات", "accent"], hold: ["ثبّت اليوم", "recover"], down: ["خفّف الوزن", "fresh"] };
   const [lo, hi] = rangeOf(ex);
-  const rangeChips = `<div class="ranges" role="group" aria-label="نطاق العدّات">${RANGES.map(([a, b]) =>
+  const wkR = wkRange(ex);
+  const rangeChips = wkR ? `<p class="why" style="margin:0">حسب نوع التدريب «${TT[wk().type].name}» ببرنامج اليوم. بتغيّره من «عدّل البرنامج».</p>` : `<div class="ranges" role="group" aria-label="نطاق العدّات">${RANGES.map(([a, b]) =>
     `<button type="button" data-range="${a}-${b}" aria-pressed="${a === lo && b === hi}"><span class="num">${a}–${b}</span></button>`).join("")}</div>`;
   const trendTxt = p => p == null ? "" : `<span class="trend ${p >= 0.25 ? "up" : p <= -0.25 ? "down" : ""}"><span class="num">${p > 0 ? "+" : ""}${p.toFixed(1)}%</span> بالأسبوع</span>`;
   const advice = sug && sug.status && (sug.status.key === "flat" || sug.status.key === "down") ? `<details class="advice"${sug.status.key === "down" ? " open" : ""}>
@@ -1361,8 +1550,13 @@ function renderExercise() {
   const nextRow = `<tr class="next"><td><span class="idx">${nextIdx}</span></td>
       <td class="prev">${pNext ? `${fmtW(pNext.w)}×${pNext.r}` : "—"}</td>
       <td class="n" style="color:var(--accent)">${fmtW(d.w)}</td><td class="n" style="color:var(--accent)">${d.r}</td><td></td><td></td></tr>`;
-  const upcoming = nextRow + (prevSes?.sets || []).slice(todaySets.length + 1).map((p, j) => `<tr><td><span class="idx">${nextIdx + j + 1}</span></td>
-      <td class="prev">${fmtW(p.w)}×${p.r}</td><td class="n muted">—</td><td class="n muted">—</td><td></td><td></td></tr>`).join("");
+  const wIn = wk() && wk().items.includes(ex.id) ? wk() : null;
+  const planned = wIn ? wIn.sets : (prevSes?.sets.length || 0);
+  const upcoming = nextRow + Array.from({ length: Math.max(0, planned - nextIdx) }, (_, j) => {
+    const p = prevSes?.sets[nextIdx + j];
+    return `<tr><td><span class="idx">${nextIdx + j + 1}</span></td>
+      <td class="prev">${p ? `${fmtW(p.w)}×${p.r}` : "—"}</td><td class="n muted">—</td><td class="n muted">—</td><td></td><td></td></tr>`;
+  }).join("");
 
   const metricPts = {
     max: ses.map(s => ({ day: s.day, v: Math.max(...s.sets.map(x => x.w)) })),
@@ -1380,6 +1574,7 @@ function renderExercise() {
         <div class="chips"><span class="chip">${MUSCLES[ex.muscle].name}</span><span class="chip">${isGM() ? '<span dir="ltr">Gym Monster 2</span>' : TYPES[ex.type]}</span></div></div>
       ${best ? `<div class="pr"><small>أعلى وزن</small><b class="num">${fmtW(best.maxW)}</b></div>` : ""}
     </div>
+    ${wkStripHTML(ex)}
     ${target}
     ${guideHTML(ex, ui.guideOpen[ex.id] ?? !ses.length)}
     <div class="card stack">
@@ -1419,7 +1614,7 @@ function renderExercise() {
     </div>` : ""}
     ${pastHTML ? `<div class="card"><h3 style="margin-bottom:4px">الجلسات السابقة</h3>${pastHTML}</div>` : ""}
     ${ex.custom ? `<button class="btn danger" type="button" data-confirm="delete-ex">حذف هالتمرين وكل تسجيلاته</button>` : ""}
-    <div class="logbar"><button class="cta" type="button" id="log-set">${I.check} سجّل المجموعة ${nextIdx}</button></div>
+    <div class="logbar"><button class="cta" type="button" id="log-set">${I.check} سجّل المجموعة ${nextIdx}${wIn && nextIdx <= wIn.sets ? ` من ${wIn.sets}` : ""}</button></div>
   </div>`;
 }
 
@@ -1524,10 +1719,10 @@ function renderSettings() {
 }
 
 function render() {
-  const fn = { home: renderHome, body: renderBody, progress: renderProgress, muscle: renderMuscle, exercise: renderExercise, history: renderHistory, settings: renderSettings }[ui.view] || renderHome;
+  const fn = { home: renderHome, body: renderBody, progress: renderProgress, muscle: renderMuscle, exercise: renderExercise, history: renderHistory, settings: renderSettings, builder: renderBuilder }[ui.view] || renderHome;
   $view.innerHTML = fn();
   document.body.dataset.view = ui.view;
-  const tab = { home: "home", body: "body", muscle: "body", exercise: "body", progress: "progress", history: "history" }[ui.view] || "";
+  const tab = { home: "home", builder: "home", body: "body", muscle: "body", exercise: "body", progress: "progress", history: "history" }[ui.view] || "";
   document.querySelectorAll(".nav [data-go]").forEach(b => {
     if (b.dataset.go === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
   });
@@ -1544,7 +1739,8 @@ function go(view, params = {}, push = true) {
 }
 window.addEventListener("popstate", e => { Object.assign(ui, e.state || { view: "home" }); render(); });
 function back() {
-  if (ui.view === "exercise") go("muscle", { muscle: exById(ui.ex)?.muscle || ui.muscle });
+  if (ui.view === "exercise" && wk()?.items.includes(ui.ex)) go("home");
+  else if (ui.view === "exercise") go("muscle", { muscle: exById(ui.ex)?.muscle || ui.muscle });
   else if (ui.view === "muscle") go("body");
   else go("home");
 }
@@ -1599,7 +1795,8 @@ function startTimer(sec) {
   if (ex && d) {
     const done = sessionsOf(ex.id).find(x => x.day === todayKey())?.sets.length || 0;
     const prev = sessionsOf(ex.id).filter(x => x.day !== todayKey()).pop()?.sets[done];
-    $("rest-ctx").textContent = `${ex.name} · المجموعة ${done} خلصت`;
+    $("rest-ctx").textContent = done ? `${ex.name} · المجموعة ${done} خلصت` : `التمرين الجاي: ${ex.name}`;
+    $("rest-nl").textContent = done ? "المجموعة الجاية" : `التمرين الجاي: ${ex.name}`;
     $("rest-nw").textContent = fmtW(d.w); $("rest-nr").textContent = d.r;
     $("rest-prev").innerHTML = prev ? `المرة الماضية <span class="num">${fmtW(prev.w)}×${prev.r}</span>` : "";
     $("rest-next").hidden = false;
@@ -1646,8 +1843,12 @@ function logSet() {
   // Unlock audio on this tap so the timer beep can play later.
   try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume?.(); } catch (e) {}
   try { navigator.vibrate?.(15); } catch (e) {}
-  refresh();
-  startTimer(db.rest);
+  const w = wk(), inWk = w && w.items.includes(ex.id);
+  const finished = inWk && doneToday(ex.id) === w.sets;
+  const nxt = finished ? wkNext(w) : null;
+  if (nxt) go("exercise", { ex: nxt }); else refresh();
+  if (finished && !nxt) { hideTimer(); return toast("🎉 خلصت تمرين اليوم كله. يعطيك العافية!", null, true); }
+  startTimer((inWk && TT[w.type].rest) || db.rest);
   if (prev && d.w > prev.maxW) toast(`🏆 رقم قياسي جديد: <span class="num">${fmtW(d.w)}</span> كغ!`, null, true);
   else if (prev && e1rm(d.w, d.r) > prev.best1 + 0.01) toast("🔥 أفضل أداء إلك بهالتمرين (وزن × عدّات)", null, true);
 }
@@ -1674,6 +1875,7 @@ function importJSON(text) {
   } catch (e) { toast("البيانات مش صالحة. تأكد إنك نسخت النص كامل."); }
 }
 const confirmActions = {
+  "end-wk"() { delete db.workout; save(); refresh(); toast("انتهى برنامج اليوم"); },
   reset() { db = DEFAULTS(); save(); go("home"); toast("انمسحت كل البيانات"); },
   "delete-ex"() {
     const id = ui.ex, m = exById(id).muscle;
@@ -1684,9 +1886,25 @@ const confirmActions = {
 };
 
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-equip],[data-range],[data-rir],[data-go],[data-side],[data-m],[data-muscle],[data-ex],[data-back],[data-step],[data-del],[data-confirm],[data-metric],[data-cal],[data-jump],#log-set,#export-copy,#export-file,#import-go,#whoop-connect,#whoop-sync,#whoop-off");
+  const t = e.target.closest("[data-equip],[data-range],[data-rir],[data-go],[data-side],[data-m],[data-muscle],[data-ex],[data-back],[data-step],[data-del],[data-confirm],[data-metric],[data-cal],[data-jump],[data-bopen],[data-bgroup],[data-btype],[data-bsets],[data-bswap],[data-bup],[data-brm],[data-bpick],[data-breroll],[data-bstart],#log-set,#export-copy,#export-file,#import-go,#whoop-connect,#whoop-sync,#whoop-off");
   if (!t) return;
   if (t.dataset.go) return go(t.dataset.go);
+  if (t.hasAttribute("data-bopen")) return openBuilder();
+  if (t.hasAttribute("data-bstart")) return startWorkout();
+  const b = ui.bld;
+  if (b && t.dataset.bgroup) {
+    const g = t.dataset.bgroup;
+    b.groups = (b.groups.includes(g) ? b.groups.filter(x => x !== g) : [...b.groups, g]).sort((x, y) => GROUPS.indexOf(x) - GROUPS.indexOf(y));
+    b.items = buildWorkout(b.groups); b.pick = null;
+    return refresh();
+  }
+  if (b && t.dataset.btype) { b.type = t.dataset.btype; return refresh(); }
+  if (b && t.dataset.bsets) { b.sets = +t.dataset.bsets; return refresh(); }
+  if (b && t.dataset.bswap) { const p = t.dataset.bswap === "add" ? "add" : +t.dataset.bswap; b.pick = b.pick === p ? null : p; return refresh(); }
+  if (b && t.dataset.bup) { const i = +t.dataset.bup; [b.items[i - 1], b.items[i]] = [b.items[i], b.items[i - 1]]; b.pick = null; return refresh(); }
+  if (b && t.dataset.brm) { b.items.splice(+t.dataset.brm, 1); b.pick = null; return refresh(); }
+  if (b && t.dataset.bpick) { if (b.pick === "add") b.items.push(t.dataset.bpick); else b.items[b.pick] = t.dataset.bpick; b.pick = null; return refresh(); }
+  if (b && t.hasAttribute("data-breroll")) { b.items = buildWorkout(b.groups, true); b.pick = null; return refresh(); }
   if (t.dataset.side) { ui.side = t.dataset.side; return refresh(); }
   if (t.dataset.m) return go("muscle", { muscle: t.dataset.m });
   if (t.dataset.muscle) return go("muscle", { muscle: t.dataset.muscle });
